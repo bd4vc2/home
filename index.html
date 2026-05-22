@@ -52,4 +52,405 @@
         }
 
         .loader-text { font-family: 'Orbitron', sans-serif; color: var(--neon-blue); letter-spacing: 5px; margin-bottom: 20px; font-weight: 900; }
-        .progress-rail { width: 300
+        .progress-rail { width: 300px; height: 2px; background: #111; position: relative; }
+        #progress-fill { width: 0%; height: 100%; background: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); }
+        #boot-status { font-size: 0.7rem; color: var(--v-gold); margin-top: 10px; font-style: italic; }
+
+        /* HUD TOP */
+        .hud-top {
+            display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+            padding: 12px 40px; border-bottom: 1px solid var(--neon-blue);
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(15px);
+            position: relative; z-index: 100; box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
+        }
+
+        .version-box { font-family: 'Orbitron', sans-serif; font-size: 0.7rem; color: var(--v-gold); font-weight: bold; }
+        .main-title { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 1.4rem; color: var(--neon-blue); letter-spacing: 8px; text-align: center; text-shadow: 0 0 10px rgba(0,242,255,0.5); }
+        .hud-right { display: flex; justify-content: flex-end; gap: 20px; align-items: center; }
+        #clock { color: var(--neon-blue); font-weight: bold; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; }
+        #net-speed { color: var(--hacker-green); font-size: 0.75rem; border: 1px solid var(--hacker-green); padding: 2px 6px; border-radius: 3px; background: rgba(0,255,153,0.05); }
+
+        /* DASHBOARD GRID */
+        .grid-container {
+            display: grid; grid-template-columns: 330px 1fr 330px; gap: 20px;
+            padding: 20px; max-width: 1750px; margin: 0 auto;
+            position: relative; z-index: 50;
+            opacity: 0; transform: scale(0.97); transition: 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .grid-container.active { opacity: 1; transform: scale(1); }
+
+        /* CARD MODULES */
+        .module {
+            background: var(--glass-dark); border: 1px solid var(--border-glow);
+            border-radius: 4px; overflow: hidden; box-shadow: 0 10px 35px rgba(0,0,0,0.6);
+            backdrop-filter: blur(12px); margin-bottom: 15px; position: relative;
+        }
+
+        .module-header {
+            background: rgba(0, 242, 255, 0.12); color: var(--neon-blue);
+            padding: 8px 15px; font-family: 'Orbitron', sans-serif; font-size: 0.7rem;
+            font-weight: bold; border-bottom: 1px solid var(--border-glow);
+            display: flex; justify-content: space-between; align-items: center;
+            letter-spacing: 1px;
+        }
+
+        .module-content { padding: 15px; }
+        .data-line { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 4px; font-size: 0.85rem; }
+        .tag-list { display: flex; flex-wrap: wrap; gap: 5px; }
+        .tag { background: rgba(0, 242, 255, 0.08); border: 1px solid var(--neon-blue); padding: 3px 6px; font-size: 0.65rem; color: var(--neon-blue); border-radius: 2px; }
+
+        /* INTERACTIVE TERMINAL ENGINE WITH COMMAND BAR */
+        .terminal-box { display: flex; flex-direction: column; background: rgba(0, 3, 8, 0.6); border-radius: 3px; border: 1px solid rgba(0, 255, 153, 0.2); }
+        #live-log { height: 215px; overflow-y: hidden; font-size: 0.78rem; color: var(--hacker-green); text-shadow: 0 0 4px var(--hacker-green); line-height: 1.5; padding: 10px; box-sizing: border-box; }
+        .cli-input-wrapper { display: flex; background: rgba(0,0,0,0.5); border-top: 1px solid rgba(0, 255, 153, 0.2); padding: 6px 10px; align-items: center; }
+        .cli-prompt { color: var(--hacker-green); font-weight: bold; margin-right: 8px; font-size: 0.8rem; }
+        #cli-cmd { background: transparent; border: none; outline: none; color: #fff; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; flex: 1; }
+
+        /* LIVE HARDWARE CPU CORE MATRIX COMPONENT */
+        .cpu-matrix-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; }
+        .cpu-core-block { background: rgba(255,255,255,0.03); border: 1px solid rgba(0, 242, 255, 0.1); border-radius: 2px; padding: 6px; text-align: center; }
+        .core-label { font-size: 0.6rem; color: #668899; display: block; margin-bottom: 3px; }
+        .core-bar-rail { width: 100%; height: 4px; background: rgba(0,0,0,0.5); position: relative; border-radius: 1px; overflow: hidden; }
+        .core-bar-fill { width: 12%; height: 100%; background: var(--neon-blue); transition: width 0.4s ease; }
+        .core-val-text { font-size: 0.65rem; font-weight: bold; margin-top: 2px; display: inline-block; color: #fff; }
+
+        /* MUSIC COUPLER STYLES */
+        .scrobble-count { color: var(--v-gold); font-weight: bold; }
+        #track-title { color: #fff; font-size: 0.95rem; font-weight: bold; margin: 4px 0; min-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: 0.5px; }
+        #track-artist { color: var(--neon-blue); font-size: 0.8rem; margin: 0 0 8px 0; min-height: 16px; }
+        .pulse-dot { display: inline-block; width: 7px; height: 7px; background-color: var(--hacker-green); border-radius: 50%; margin-right: 6px; box-shadow: 0 0 6px var(--hacker-green); }
+        .pulsing { animation: blink 1.4s infinite ease-in-out; }
+        @keyframes blink { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+
+        /* BUTTONS */
+        .btn {
+            display: block; width: 100%; padding: 10px; margin-bottom: 8px; box-sizing: border-box;
+            background: var(--glass-bright); border: 1px solid var(--neon-blue);
+            color: #fff; text-decoration: none; text-align: center;
+            font-family: 'Orbitron', sans-serif; font-size: 0.65rem; transition: 0.25s;
+            border-radius: 2px; letter-spacing: 1px; font-weight: bold;
+        }
+        .btn:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px var(--neon-blue); transform: translateX(2px); }
+    </style>
+</head>
+<body>
+
+    <div id="boot-screen">
+        <div class="loader-text">ICEY_OS // V2.9.0</div>
+        <div class="progress-rail"><div id="progress-fill"></div></div>
+        <div id="boot-status">Initializing system assets...</div>
+    </div>
+
+    <div class="aero-bg"></div>
+
+    <header class="hud-top">
+        <div class="version-box">SYS_VER: 2.9.0 // CODENAME: GARGANTUA</div>
+        <div class="main-title">ICEY // TACTICAL_COMMAND</div>
+        <div class="hud-right">
+            <div id="net-speed">NET_LINK: CHECKING...</div>
+            <div id="clock">00:00:00 PM</div>
+        </div>
+    </header>
+
+    <main class="grid-container" id="dash">
+        <div class="column">
+            <div class="module">
+                <div class="module-header">USER_MANIFEST</div>
+                <div class="module-content">
+                    <p style="font-size: 0.85rem; line-height: 1.6; margin: 0;">
+                        Architect of meme-rockets, survivor of the Subnautica depths, and keeper of the Montana ranch. Pushing hardware limits. 🍪
+                    </p>
+                </div>
+            </div>
+
+            <div class="module">
+                <div class="module-header">SYSTEM_LOADOUT</div>
+                <div class="module-content">
+                    <div class="data-line"><span>CPU</span> <strong>i7-12700K</strong></div>
+                    <div class="data-line"><span>GPU</span> <strong style="color: var(--neon-blue);">RTX 3080 Ti</strong></div>
+                    <div class="data-line"><span>RAM</span> <strong>32GB 3600MT/s</strong></div>
+                    <div class="data-line"><span>C_DRIVE</span> <strong>90.8 GB FREE</strong></div>
+                </div>
+            </div>
+
+            <div class="module" style="border-color: rgba(0, 242, 255, 0.4);">
+                <div class="module-header">
+                    <span>CPU_THREAD_MATRIX</span><span style="color: var(--neon-blue);" id="matrix-load">AVG: 4%</span>
+                </div>
+                <div class="module-content">
+                    <div class="cpu-matrix-grid" id="cpu-core-container">
+                        </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="column">
+            <div class="module" style="border-color: var(--hacker-green);">
+                <div class="module-header" style="background: rgba(0, 255, 153, 0.12); color: var(--hacker-green);">
+                    <span>COMMAND_SHELL_INTERACTION</span> <span id="shell-status" style="animation: blink 2s infinite;">ONLINE</span>
+                </div>
+                <div class="module-content" style="padding: 10px;">
+                    <div class="terminal-box">
+                        <div id="live-log">
+                            <div>&gt; ICE_OS CORE CORE SECURELY ANCHORED.</div>
+                            <div>&gt; Type <span style="color:#fff; font-weight:bold;">/help</span> below to access terminal arrays.</div>
+                        </div>
+                        <div class="cli-input-wrapper">
+                            <span class="cli-prompt">ICEY@SYS:~$</span>
+                            <input type="text" id="cli-cmd" placeholder="Enter routine matrix parameters..." autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="module">
+                <div class="module-header">MISSION_PARAMETERS</div>
+                <div class="module-content">
+                    <div class="data-line"><span style="color: var(--v-gold);">KERBAL SPACE PROGRAM</span> <span>Meme-Rocket Engineering</span></div>
+                    <div class="data-line"><span style="color: var(--v-gold);">SUBNAUTICA 2</span> <span>Deep-Sea Reconnaissance</span></div>
+                    <div class="data-line"><span style="color: var(--v-gold);">RED DEAD 2</span> <span>Frontier Justice Simulator</span></div>
+                    <div class="data-line"><span style="color: var(--v-gold);">FARM SIM 22</span> <span>Montana Ranch Management</span></div>
+                </div>
+            </div>
+
+            <div class="module">
+                <div class="module-header">CORE_INTERESTS</div>
+                <div class="module-content">
+                    <div class="tag-list">
+                        <span class="tag">AEROSPACE_ENG</span>
+                        <span class="tag">SUB-AQUATIC_RECON</span>
+                        <span class="tag">OUTLAW_HISTORY</span>
+                        <span class="tag">PC_OVERCLOCKING</span>
+                        <span class="tag">SANDBOX_ARCHITECTURE</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="column">
+            <div class="module" style="border-color: var(--neon-blue);">
+                <div class="module-header">
+                    <span>LIVE_AUDIO_LINK</span>
+                    <span id="listening-status"><span class="pulse-dot"></span>OFFLINE</span>
+                </div>
+                <div class="module-content">
+                    <div style="font-size: 0.65rem; opacity: 0.5; letter-spacing: 1px; margin-bottom: 2px;">CURRENTLY_SPINNING:</div>
+                    <div id="track-title">CONNECTING_TELEMETRY...</div>
+                    <div id="track-artist">---</div>
+                    <div class="data-line" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;">
+                        <span>TOTAL_PLAYS</span> <span id="total-scrobbles" class="scrobble-count">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="module">
+                <div class="module-header">COMM_ARRAY</div>
+                <div class="module-content">
+                    <a href="https://www.youtube.com/@yeci_.1" class="btn" target="_blank">YOUTUBE_PRIMARY</a>
+                    <a href="https://www.roblox.com/users/4447690823/profile" class="btn" target="_blank">ROBLOX_LINK</a>
+                    <a href="https://www.last.fm/user/icy51" class="btn" target="_blank">LAST_FM_DOSSIER</a>
+                    <div style="font-size: 0.65rem; text-align: center; opacity: 0.4; margin-top: 8px;">ENCRYPTED_ID: ._icey1</div>
+                </div>
+            </div>
+
+            <div class="module">
+                <div class="module-header">VERSION_LOGS</div>
+                <div class="module-content" style="font-size: 0.7rem; color: rgb(102, 136, 153); line-height: 1.4;">
+                    <div>v2.9.0: CLI Interface & Hardware Core Array</div>
+                    <div>v2.8.0: The Last.fm Asynchronous Link</div>
+                    <div>v2.7.0: Neo-Aero Startup Logic</div>
+                    <div>v2.6.6: Hollywood Hacker Mode</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // BULLETPROOF BOOT LOADER
+        let progress = 0;
+        const bar = document.getElementById('progress-fill');
+        const status = document.getElementById('boot-status');
+        
+        const bootTips = [
+            "Adding more struts...", "Ignoring the Kraken...", "Checking Reaper migration patterns...",
+            "Stabilizing Gargantua orbit...", "Downloading additional VRAM...", "Syncing Ranch data...",
+            "Overclocking toaster...", "Generating cookie crumbs...", "Bypassing Montana firewalls..."
+        ];
+
+        const bootInterval = setInterval(() => {
+            progress += Math.floor(Math.random() * 15) + 5;
+            
+            // Hard gate to prevent staying stuck
+            if (progress >= 100) {
+                progress = 100;
+                clearInterval(bootInterval);
+                bar.style.width = "100%";
+                
+                setTimeout(() => {
+                    document.getElementById('boot-screen').style.display = 'none';
+                    document.getElementById('dash').classList.add('active');
+                    // Launch modules securely
+                    initMatrix();
+                    fetchLastFM();
+                    fetchNetworkSpeed();
+                }, 300);
+            } else {
+                bar.style.width = progress + "%";
+                if (Math.random() > 0.7) {
+                    status.innerText = bootTips[Math.floor(Math.random() * bootTips.length)];
+                }
+            }
+        }, 150);
+
+        // SYSTEM TIME
+        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
+
+        // NETWORK SPEED TELEMETRY
+        function fetchNetworkSpeed() {
+            const netDisplay = document.getElementById('net-speed');
+            if (navigator.connection) {
+                const conn = navigator.connection;
+                const speed = conn.downlink ? `${conn.downlink} MBPS` : 'ACTIVE';
+                const type = conn.effectiveType ? conn.effectiveType.toUpperCase() : 'LAN';
+                netDisplay.innerText = `NET_LINK: ${speed} // ${type}`;
+            } else {
+                netDisplay.innerText = "NET_LINK: SECURE // GB_LAN";
+            }
+        }
+
+        // CONTROL TERMINAL SIMULATION ENGINE
+        const log = document.getElementById('live-log');
+        const logEntries = [
+            "> WARNING: Kraken detected near Jool sector.", "> Re-routing primary aux-grid to Montana Ranch...",
+            "> Scanning mainframe database for unallocated struts...", "> Downloading cookie.tar.gz... [SUCCESS]",
+            "> Readjusting singularity accretion disk scale limits...", "> Local environment payload: Arthur_Morgan.exe ready.",
+            "> Telemetry warning: Subnautica depth threshold breached.", "> i7-12700K baseline diagnostics completely stable.",
+            "> Syncing core configuration timeline protocols with Gargantua..."
+        ];
+
+        setInterval(() => {
+            pushTerminalLine(logEntries[Math.floor(Math.random() * logEntries.length)]);
+        }, 3200);
+
+        function pushTerminalLine(text) {
+            const entry = document.createElement('div');
+            entry.innerHTML = text;
+            log.appendChild(entry);
+            if (log.children.length > 11) {
+                log.removeChild(log.firstElementChild);
+            }
+        }
+
+        // HARDWARE LOGIC MATRIX GENERATOR
+        const coresCount = 12;
+        function initMatrix() {
+            const matrixBox = document.getElementById('cpu-core-container');
+            matrixBox.innerHTML = '';
+            for(let i=0; i < coresCount; i++) {
+                const block = document.createElement('div');
+                block.className = 'cpu-core-block';
+                block.innerHTML = `
+                    <span class="core-label">T_${String(i+1).padStart(2,'0')}</span>
+                    <div class="core-bar-rail"><div class="core-bar-fill" id="core-fill-${i}"></div></div>
+                    <span class="core-val-text" id="core-txt-${i}">4%</span>
+                `;
+                matrixBox.appendChild(block);
+            }
+            updateMatrix();
+            setInterval(updateMatrix, 1200);
+        }
+
+        function updateMatrix() {
+            let totalLoad = 0;
+            for(let i=0; i<coresCount; i++) {
+                let randLoad = Math.floor(Math.random() * 20) + 2;
+                if (Math.random() > 0.85) randLoad = Math.floor(Math.random() * 55) + 30;
+                totalLoad += randLoad;
+                
+                const fillEl = document.getElementById(`core-fill-${i}`);
+                const txtEl = document.getElementById(`core-txt-${i}`);
+                if (fillEl && txtEl) {
+                    fillEl.style.width = randLoad + "%";
+                    txtEl.innerText = randLoad + "%";
+                    fillEl.style.backgroundColor = randLoad > 70 ? 'var(--alert-red)' : (randLoad > 40 ? 'var(--v-gold)' : 'var(--neon-blue)');
+                }
+            }
+            const avgLoad = Math.round(totalLoad / coresCount);
+            document.getElementById('matrix-load').innerText = `AVG: ${avgLoad}%`;
+        }
+
+        // COMMAND RUNTIME ROUTER 
+        const cmdInput = document.getElementById('cli-cmd');
+        cmdInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const inputVal = cmdInput.value.trim();
+                if (!inputVal) return;
+                
+                pushTerminalLine(`<span style="color:#fff;">$ ${inputVal}</span>`);
+                cmdInput.value = '';
+                
+                const lowerCmd = inputVal.toLowerCase();
+                if (lowerCmd === '/help') {
+                    pushTerminalLine("<span style='color:var(--v-gold);'>SYSTEM CODES: /clear, /status, /overclock, /fetch, /flex</span>");
+                } else if (lowerCmd === '/clear') {
+                    log.innerHTML = "<div>&gt; Command console register buffer completely wiped.</div>";
+                } else if (lowerCmd === '/status') {
+                    pushTerminalLine("&gt; DISPATCH: All background routines operating within green specs.");
+                } else if (lowerCmd === '/overclock') {
+                    pushTerminalLine("<span style='color:var(--alert-red); font-weight:bold;'>&gt; ALERT: CPU Core matrix parameters unlocked. Pushing voltage lines!</span>");
+                    document.getElementById('matrix-load').innerText = `AVG: 98%`;
+                    for(let i=0; i<coresCount; i++) {
+                        document.getElementById(`core-fill-${i}`).style.width = "98%";
+                        document.getElementById(`core-fill-${i}`).style.backgroundColor = "var(--alert-red)";
+                        document.getElementById(`core-txt-${i}`).innerText = "98%";
+                    }
+                } else if (lowerCmd === '/fetch') {
+                    pushTerminalLine("&gt; Querying remote telemetry array link immediately...");
+                    fetchLastFM();
+                } else if (lowerCmd === '/flex') {
+                    pushTerminalLine("<span style='color:var(--neon-blue);'>&gt; PROOF OF ADVANCED LOGIC: Site layout modern grid system running loop arrays via asynchronous intervals. Zero static tables used.</span>");
+                } else {
+                    pushTerminalLine(`&gt; ERROR: Unknown script parameters '${inputVal}'. Type /help.`);
+                }
+            }
+        });
+
+        // REMOTE LAST.FM FEED API DATA SYNCER
+        async function fetchLastFM() {
+            const username = "icy51";
+            const url = `https://wscsub.vercel.app/api/user/${username}`;
+            
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('CORS Gateway offset reset.');
+                const data = await response.json();
+                
+                const track = data.recenttracks.track[0];
+                const totalScrobbles = data.recenttracks['@attr'].total;
+                
+                const name = track.name;
+                const artist = track.artist['#text'];
+                const isNowPlaying = track['@attr'] && track['@attr'].nowplaying === "true";
+                
+                document.getElementById('track-title').innerText = name.toUpperCase();
+                document.getElementById('track-artist').innerText = artist.toUpperCase();
+                document.getElementById('total-scrobbles').innerText = Number(totalScrobbles).toLocaleString();
+                
+                const statusIndicator = document.getElementById('listening-status');
+                if (isNowPlaying) {
+                    statusIndicator.innerHTML = `<span class="pulse-dot pulsing"></span>LIVE`;
+                    statusIndicator.style.color = "var(--hacker-green)";
+                } else {
+                    statusIndicator.innerHTML = `<span class="pulse-dot" style="background-color: #555; box-shadow: none;"></span>IDLE`;
+                    statusIndicator.style.color = "#888";
+                }
+            } catch (error) {
+                console.error('API Error:', error);
+                document.getElementById('track-title').innerText = "SIGNAL_LOST_TELEMETRY";
+            }
+        }
+        setInterval(fetchLastFM, 15000);
+    </script>
+</body>
+</html>
