@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ICEY // TACTICAL_OS v2.9.2</title>
+    <title>ICEY // TACTICAL_OS v3.0.0</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -37,11 +37,19 @@
             z-index: 999; background-size: 100% 3px, 6px 100%; pointer-events: none;
         }
 
-        .aero-bg {
+        #bg-canvas {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, #0a1626 0%, var(--dark-void) 100%);
-            z-index: -1;
+            z-index: -1; background: radial-gradient(circle at center, #0a1626 0%, var(--dark-void) 100%);
         }
+
+        /* EMERGENCY ALARM OVERLAY */
+        #hazard-overlay {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: repeating-linear-gradient(45deg, rgba(255,51,102,0.15), rgba(255,51,102,0.15) 10px, rgba(0,0,0,0) 10px, rgba(0,0,0,0) 20px);
+            z-index: 900; opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
+        }
+        @keyframes hazard-pulse { 0%, 100% { background-color: rgba(255,51,102,0.02); } 50% { background-color: rgba(255,51,102,0.12); } }
+        .critical-alert #hazard-overlay { opacity: 1; animation: hazard-pulse 1s infinite; }
 
         /* LOADING OVERLAY */
         #boot-screen {
@@ -71,7 +79,7 @@
 
         /* DASHBOARD GRID */
         .grid-container {
-            display: grid; grid-template-columns: 330px 1fr 330px; gap: 20px;
+            display: grid; grid-template-columns: 340px 1fr 340px; gap: 20px;
             padding: 20px; max-width: 1750px; margin: 0 auto;
             position: relative; z-index: 50;
             opacity: 0; transform: scale(0.97); transition: 1s cubic-bezier(0.16, 1, 0.3, 1);
@@ -84,6 +92,7 @@
             background: var(--glass-dark); border: 1px solid var(--border-glow);
             border-radius: 4px; overflow: hidden; box-shadow: 0 10px 35px rgba(0,0,0,0.6);
             backdrop-filter: blur(12px); margin-bottom: 15px; position: relative;
+            transition: border-color 0.5s ease;
         }
 
         .module-header {
@@ -101,7 +110,7 @@
 
         /* INTERACTIVE TERMINAL */
         .terminal-box { display: flex; flex-direction: column; background: rgba(0, 3, 8, 0.6); border-radius: 3px; border: 1px solid rgba(0, 255, 153, 0.2); }
-        #live-log { height: 215px; overflow-y: hidden; font-size: 0.78rem; color: var(--hacker-green); text-shadow: 0 0 4px var(--hacker-green); line-height: 1.5; padding: 10px; box-sizing: border-box; }
+        #live-log { height: 180px; overflow-y: hidden; font-size: 0.78rem; color: var(--hacker-green); text-shadow: 0 0 4px var(--hacker-green); line-height: 1.5; padding: 10px; box-sizing: border-box; }
         .cli-input-wrapper { display: flex; background: rgba(0,0,0,0.5); border-top: 1px solid rgba(0, 255, 153, 0.2); padding: 6px 10px; align-items: center; }
         .cli-prompt { color: var(--hacker-green); font-weight: bold; margin-right: 8px; font-size: 0.8rem; }
         #cli-cmd { background: transparent; border: none; outline: none; color: #fff; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; flex: 1; }
@@ -111,10 +120,10 @@
         .cpu-core-block { background: rgba(255,255,255,0.03); border: 1px solid rgba(0, 242, 255, 0.1); border-radius: 2px; padding: 6px; text-align: center; }
         .core-label { font-size: 0.6rem; color: #668899; display: block; margin-bottom: 3px; }
         .core-bar-rail { width: 100%; height: 4px; background: rgba(0,0,0,0.5); position: relative; border-radius: 1px; overflow: hidden; }
-        .core-bar-fill { width: 12%; height: 100%; background: var(--neon-blue); transition: width 0.4s ease; }
+        .core-bar-fill { width: 12%; height: 100%; background: var(--neon-blue); transition: width 0.4s ease, background-color 0.4s ease; }
         .core-val-text { font-size: 0.65rem; font-weight: bold; margin-top: 2px; display: inline-block; color: #fff; }
 
-        /* ADVANCED MUSIC PANEL STYLES */
+        /* AUDIO NODE STYLES */
         .audio-link-content { display: flex; gap: 15px; align-items: center; }
         .album-art-wrapper { width: 64px; height: 64px; border: 1px solid var(--border-glow); background: #020b14; position: relative; display: flex; align-items: center; justify-content: center; border-radius: 2px; overflow: hidden; flex-shrink: 0; }
         #album-art { width: 100%; height: 100%; object-fit: cover; display: none; }
@@ -127,29 +136,38 @@
         .pulsing { animation: blink 1.4s infinite ease-in-out; }
         @keyframes blink { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
 
+        /* LIVE TELEMETRY PING GRAPH GRAPHICS */
+        .ping-container { display: flex; align-items: flex-end; height: 45px; gap: 3px; padding-top: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .ping-bar { flex: 1; background: rgba(0, 242, 255, 0.2); height: 10%; transition: height 0.3s ease, background-color 0.3s; }
+
+        /* WAVEFORM SIMULATOR EQ CONTAINER */
+        .eq-container { display: flex; justify-content: space-between; align-items: flex-end; height: 20px; margin-top: 10px; gap: 2px; padding: 0 2px; }
+        .eq-bar { width: 6%; height: 15%; background: var(--hacker-green); transition: height 0.15s ease; box-shadow: 0 0 4px rgba(0, 255, 153, 0.3); }
+
         /* BUTTONS */
         .btn {
             display: block; width: 100%; padding: 10px; margin-bottom: 8px; box-sizing: border-box;
             background: var(--glass-bright); border: 1px solid var(--neon-blue);
             color: #fff; text-decoration: none; text-align: center;
             font-family: 'Orbitron', sans-serif; font-size: 0.65rem; transition: 0.25s;
-            border-radius: 2px; letter-spacing: 1px; font-weight: bold;
+            border-radius: 2px; letter-spacing: 1px; font-weight: bold; cursor: pointer;
         }
         .btn:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px var(--neon-blue); transform: translateX(2px); }
     </style>
 </head>
 <body>
 
+    <div id="hazard-overlay"></div>
+    <canvas id="bg-canvas"></canvas>
+
     <div id="boot-screen">
-        <div class="loader-text">ICEY_OS // V2.9.2</div>
+        <div class="loader-text">ICEY_OS // V3.0.0</div>
         <div class="progress-rail"><div id="progress-fill"></div></div>
-        <div id="boot-status">Initializing system assets...</div>
+        <div id="boot-status">Initializing telemetry core matrices...</div>
     </div>
 
-    <div class="aero-bg"></div>
-
     <header class="hud-top">
-        <div class="version-box">SYS_VER: 2.9.2 // CODENAME: GARGANTUA</div>
+        <div class="version-box">SYS_VER: 3.0.0 // CODENAME: GARGANTUA_PRIME</div>
         <div class="main-title">ICEY // TACTICAL_COMMAND</div>
         <div class="hud-right">
             <div id="net-speed">NET_LINK: CHECKING...</div>
@@ -178,7 +196,7 @@
                 </div>
             </div>
 
-            <div class="module" style="border-color: rgba(0, 242, 255, 0.4);">
+            <div class="module" id="cpu-module" style="border-color: rgba(0, 242, 255, 0.4);">
                 <div class="module-header">
                     <span>CPU_THREAD_MATRIX</span><span style="color: var(--neon-blue);" id="matrix-load">AVG: 4%</span>
                 </div>
@@ -190,8 +208,8 @@
         </div>
 
         <div class="column">
-            <div class="module" style="border-color: var(--hacker-green);">
-                <div class="module-header" style="background: rgba(0, 255, 153, 0.12); color: var(--hacker-green);">
+            <div class="module" id="shell-module" style="border-color: var(--hacker-green);">
+                <div class="module-header" id="shell-header" style="background: rgba(0, 255, 153, 0.12); color: var(--hacker-green);">
                     <span>COMMAND_SHELL_INTERACTION</span> <span id="shell-status" style="animation: blink 2s infinite;">ONLINE</span>
                 </div>
                 <div class="module-content" style="padding: 10px;">
@@ -208,6 +226,15 @@
                 </div>
             </div>
 
+            <div class="module" style="border-color: var(--v-gold);">
+                <div class="module-header">
+                    <span>REMOTE_PING_MATRIX</span> <span id="ping-display" style="color: var(--v-gold);">24ms</span>
+                </div>
+                <div class="module-content" style="padding-top: 5px;">
+                    <div class="ping-container" id="graph-container"></div>
+                </div>
+            </div>
+
             <div class="module">
                 <div class="module-header">MISSION_PARAMETERS</div>
                 <div class="module-content">
@@ -215,19 +242,6 @@
                     <div class="data-line"><span style="color: var(--v-gold);">SUBNAUTICA 2</span> <span>Deep-Sea Reconnaissance</span></div>
                     <div class="data-line"><span style="color: var(--v-gold);">RED DEAD 2</span> <span>Frontier Justice Simulator</span></div>
                     <div class="data-line"><span style="color: var(--v-gold);">FARM SIM 22</span> <span>Montana Ranch Management</span></div>
-                </div>
-            </div>
-
-            <div class="module">
-                <div class="module-header">CORE_INTERESTS</div>
-                <div class="module-content">
-                    <div class="tag-list">
-                        <span class="tag">AEROSPACE_ENG</span>
-                        <span class="tag">SUB-AQUATIC_RECON</span>
-                        <span class="tag">OUTLAW_HISTORY</span>
-                        <span class="tag">PC_OVERCLOCKING</span>
-                        <span class="tag">SANDBOX_ARCHITECTURE</span>
-                    </div>
                 </div>
             </div>
         </div>
@@ -250,7 +264,15 @@
                             <div id="track-artist">---</div>
                         </div>
                     </div>
-                    <div class="data-line" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;">
+                    
+                    <div class="eq-container" id="eq-wrapper">
+                        <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
+                        <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
+                        <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
+                        <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
+                    </div>
+
+                    <div class="data-line" style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;">
                         <span>TOTAL_PLAYS</span> <span id="total-scrobbles" class="scrobble-count">0</span>
                     </div>
                 </div>
@@ -269,18 +291,60 @@
             <div class="module">
                 <div class="module-header">VERSION_LOGS</div>
                 <div class="module-content" style="font-size: 0.7rem; color: rgb(102, 136, 153); line-height: 1.4;">
+                    <div>v3.0.0: Particle Engine & DOM Hazard State Vectors</div>
+                    <div>v2.9.5: Latency Telemetry Ping Tracker Graph</div>
                     <div>v2.9.2: Direct Last.fm Developer Sync</div>
-                    <div>v2.9.0: CLI Interface & Hardware Core Array</div>
-                    <div>v2.8.0: The Last.fm Asynchronous Link</div>
-                    <div>v2.6.6: Hollywood Hacker Mode</div>
                 </div>
             </div>
         </div>
     </main>
 
     <script>
+        // BACKGROUND CORE CANVAS MATRIX ENGINE
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        for(let i=0; i<35; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 1.5 + 0.5,
+                speedX: Math.random() * 0.2 - 0.1,
+                speedY: Math.random() * -0.4 - 0.1
+            });
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let gradient = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, canvas.width);
+            gradient.addColorStop(0, '#0a1626');
+            gradient.addColorStop(1, '#010812');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = 'rgba(0, 242, 255, 0.2)';
+            particles.forEach(p => {
+                p.x += p.speedX; p.y += p.speedY;
+                if(p.y < 0) { p.y = canvas.height; p.x = Math.random() * canvas.width; }
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+                ctx.fill();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
         // BOOT SEQUENCER
         let progress = 0;
+        let isOverclocked = false;
         const bar = document.getElementById('progress-fill');
         const status = document.getElementById('boot-status');
         
@@ -300,8 +364,9 @@
                     document.getElementById('boot-screen').style.display = 'none';
                     document.getElementById('dash').classList.add('active');
                     initMatrix();
+                    initPingGraph();
+                    initAudioEQ();
                     fetchLastFM();
-                    fetchNetworkSpeed();
                 }, 300);
             } else {
                 bar.style.width = progress + "%";
@@ -309,23 +374,10 @@
                     status.innerText = bootTips[Math.floor(Math.random() * bootTips.length)];
                 }
             }
-        }, 150);
+        }, 100);
 
         // CLOCK
         setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
-
-        // NETWORK TELEMETRY
-        function fetchNetworkSpeed() {
-            const netDisplay = document.getElementById('net-speed');
-            if (navigator.connection) {
-                const conn = navigator.connection;
-                const speed = conn.downlink ? `${conn.downlink} MBPS` : 'ACTIVE';
-                const type = conn.effectiveType ? conn.effectiveType.toUpperCase() : 'LAN';
-                netDisplay.innerText = `NET_LINK: ${speed} // ${type}`;
-            } else {
-                netDisplay.innerText = "NET_LINK: SECURE // GB_LAN";
-            }
-        }
 
         // CONTROL TERMINAL
         const log = document.getElementById('live-log');
@@ -333,24 +385,21 @@
             "> WARNING: Kraken detected near Jool sector.", "> Re-routing primary aux-grid to Montana Ranch...",
             "> Scanning mainframe database for unallocated struts...", "> Downloading cookie.tar.gz... [SUCCESS]",
             "> Readjusting singularity accretion disk scale limits...", "> Local environment payload: Arthur_Morgan.exe ready.",
-            "> Telemetry warning: Subnautica depth threshold breached.", "> i7-12700K baseline diagnostics completely stable.",
-            "> Syncing core configuration timeline protocols with Gargantua..."
+            "> Telemetry warning: Subnautica depth threshold breached.", "> i7-12700K baseline diagnostics completely stable."
         ];
 
         setInterval(() => {
-            pushTerminalLine(logEntries[Math.floor(Math.random() * logEntries.length)]);
-        }, 3200);
+            if(!isOverclocked) pushTerminalLine(logEntries[Math.floor(Math.random() * logEntries.length)]);
+        }, 3500);
 
         function pushTerminalLine(text) {
             const entry = document.createElement('div');
             entry.innerHTML = text;
             log.appendChild(entry);
-            if (log.children.length > 11) {
-                log.removeChild(log.firstElementChild);
-            }
+            if (log.children.length > 9) log.removeChild(log.firstElementChild);
         }
 
-        // HARDWARE CPU GRID GENERATOR
+        // HARDWARE CPU GRID
         const coresCount = 12;
         function initMatrix() {
             const matrixBox = document.getElementById('cpu-core-container');
@@ -365,15 +414,15 @@
                 `;
                 matrixBox.appendChild(block);
             }
-            updateMatrix();
             setInterval(updateMatrix, 1200);
         }
 
         function updateMatrix() {
+            if (isOverclocked) return;
             let totalLoad = 0;
             for(let i=0; i<coresCount; i++) {
-                let randLoad = Math.floor(Math.random() * 20) + 2;
-                if (Math.random() > 0.85) randLoad = Math.floor(Math.random() * 55) + 30;
+                let randLoad = Math.floor(Math.random() * 18) + 4;
+                if (Math.random() > 0.88) randLoad = Math.floor(Math.random() * 40) + 40;
                 totalLoad += randLoad;
                 
                 const fillEl = document.getElementById(`core-fill-${i}`);
@@ -384,8 +433,46 @@
                     fillEl.style.backgroundColor = randLoad > 70 ? 'var(--alert-red)' : (randLoad > 40 ? 'var(--v-gold)' : 'var(--neon-blue)');
                 }
             }
-            const avgLoad = Math.round(totalLoad / coresCount);
-            document.getElementById('matrix-load').innerText = `AVG: ${avgLoad}%`;
+            document.getElementById('matrix-load').innerText = `AVG: ${Math.round(totalLoad / coresCount)}%`;
+        }
+
+        // REALTIME VISUAL PING GRAPH
+        const totalBars = 22;
+        function initPingGraph() {
+            const graph = document.getElementById('graph-container');
+            graph.innerHTML = '';
+            for(let i=0; i<totalBars; i++) {
+                const barEl = document.createElement('div');
+                barEl.className = 'ping-bar';
+                barEl.style.height = (Math.floor(Math.random() * 40) + 20) + "%";
+                graph.appendChild(barEl);
+            }
+            setInterval(updatePingTelemetry, 800);
+        }
+
+        function updatePingTelemetry() {
+            const graph = document.getElementById('graph-container');
+            const currentPing = Math.floor(Math.random() * 14) + 14;
+            document.getElementById('ping-display').innerText = `${currentPing}ms`;
+            
+            if(graph.firstElementChild) graph.removeChild(graph.firstElementChild);
+            const nextBar = document.createElement('div');
+            nextBar.className = 'ping-bar';
+            nextBar.style.height = Math.min(100, currentPing * 2.8) + "%";
+            graph.appendChild(nextBar);
+        }
+
+        // AUDIO MATRIX EQ FREQUENCY SIMULATOR 
+        let eqInterval;
+        function initAudioEQ() {
+            const eqBars = document.querySelectorAll('.eq-bar');
+            eqInterval = setInterval(() => {
+                eqBars.forEach(bar => {
+                    let playing = document.getElementById('listening-status').innerText.includes('LIVE');
+                    let height = playing ? (Math.floor(Math.random() * 85) + 15) : 5;
+                    bar.style.height = height + "%";
+                });
+            }, 120);
         }
 
         // COMMAND INPUT ROUTER
@@ -400,26 +487,44 @@
                 
                 const lowerCmd = inputVal.toLowerCase();
                 if (lowerCmd === '/help') {
-                    pushTerminalLine("<span style='color:var(--v-gold);'>SYSTEM CODES: /clear, /status, /overclock, /fetch, /flex</span>");
+                    pushTerminalLine("<span style='color:var(--v-gold);'>SYSTEM CODES: /clear, /status, /overclock, /fetch, /flex, /safe</span>");
                 } else if (lowerCmd === '/clear') {
-                    log.innerHTML = "<div>&gt; Command console register buffer completely wiped.</div>";
+                    log.innerHTML = "<div>&gt; Command console buffer wiped.</div>";
                 } else if (lowerCmd === '/status') {
-                    pushTerminalLine("&gt; DISPATCH: All background routines operating within green specs.");
+                    pushTerminalLine(isOverclocked ? "<span style='color:var(--alert-red);'>&gt; WARNING: CORES EXCEED THERMAL LIMIT VECTOR.</span>" : "&gt; DISPATCH: Core arrays stable.");
                 } else if (lowerCmd === '/overclock') {
-                    pushTerminalLine("<span style='color:var(--alert-red); font-weight:bold;'>&gt; ALERT: CPU Core matrix parameters unlocked. Pushing voltage lines!</span>");
-                    document.getElementById('matrix-load').innerText = `AVG: 98%`;
+                    isOverclocked = true;
+                    document.body.classList.add('critical-alert');
+                    document.getElementById('cpu-module').style.borderColor = 'var(--alert-red)';
+                    document.getElementById('shell-module').style.borderColor = 'var(--alert-red)';
+                    document.getElementById('shell-header').style.background = 'rgba(255,51,102,0.15)';
+                    document.getElementById('shell-header').style.color = 'var(--alert-red)';
+                    document.getElementById('shell-status').innerText = 'CRITICAL_OVERLOAD';
+                    document.getElementById('shell-status').style.color = 'var(--alert-red)';
+                    
+                    pushTerminalLine("<span style='color:var(--alert-red); font-weight:bold;'>&gt; CORE THREAD EMERGENCY INJECT OVERCLOCK SPEEDSTERS AMBIENT EXCEEDED!!</span>");
+                    document.getElementById('matrix-load').innerText = `AVG: 99%`;
                     for(let i=0; i<coresCount; i++) {
-                        document.getElementById(`core-fill-${i}`).style.width = "98%";
+                        document.getElementById(`core-fill-${i}`).style.width = "99%";
                         document.getElementById(`core-fill-${i}`).style.backgroundColor = "var(--alert-red)";
-                        document.getElementById(`core-txt-${i}`).innerText = "98%";
+                        document.getElementById(`core-txt-${i}`).innerText = "99%";
                     }
+                } else if (lowerCmd === '/safe') {
+                    isOverclocked = false;
+                    document.body.classList.remove('critical-alert');
+                    document.getElementById('cpu-module').style.borderColor = 'rgba(0, 242, 255, 0.4)';
+                    document.getElementById('shell-module').style.borderColor = 'var(--hacker-green)';
+                    document.getElementById('shell-header').style.background = 'rgba(0, 255, 153, 0.12)';
+                    document.getElementById('shell-header').style.color = 'var(--hacker-green)';
+                    document.getElementById('shell-status').innerText = 'ONLINE';
+                    document.getElementById('shell-status').style.color = 'var(--hacker-green)';
+                    pushTerminalLine("&gt; Re-stabilizing core grids... System normalized.");
                 } else if (lowerCmd === '/fetch') {
-                    pushTerminalLine("&gt; Querying remote telemetry array link immediately...");
                     fetchLastFM();
                 } else if (lowerCmd === '/flex') {
-                    pushTerminalLine("<span style='color:var(--neon-blue);'>&gt; PROOF OF ADVANCED LOGIC: Site layout modern grid system running loop arrays via asynchronous intervals. Zero static tables used.</span>");
+                    pushTerminalLine("<span style='color:var(--neon-blue);'>&gt; FLEX PARAMETERS: Interactive background thread canvas vectors operational. 0% framework overhead.</span>");
                 } else {
-                    pushTerminalLine(`&gt; ERROR: Unknown script parameters '${inputVal}'. Type /help.`);
+                    pushTerminalLine(`&gt; ERROR: Unknown token parameters '${inputVal}'.`);
                 }
             }
         });
@@ -432,7 +537,7 @@
             
             try {
                 const response = await fetch(url);
-                if (!response.ok) throw new Error('API request failed');
+                if (!response.ok) throw new Error('API query failure');
                 const data = await response.json();
                 
                 const track = data.recenttracks.track[0];
@@ -442,46 +547,40 @@
                 const artist = track.artist['#text'];
                 const isNowPlaying = track['@attr'] && track['@attr'].nowplaying === "true";
                 
-                // Get album cover image
                 let imgUrl = "";
                 if(track.image && track.image.length > 0) {
-                    // Try to grab medium/large image
                     imgUrl = track.image[Math.min(2, track.image.length - 1)]['#text'];
                 }
                 
-                // Update text fields securely
                 document.getElementById('track-title').innerText = name.toUpperCase();
                 document.getElementById('track-artist').innerText = artist.toUpperCase();
                 document.getElementById('total-scrobbles').innerText = Number(totalScrobbles).toLocaleString();
                 
-                // Update Image Element UI
                 const artImg = document.getElementById('album-art');
                 const artFallback = document.getElementById('art-fallback');
                 if(imgUrl && imgUrl.trim() !== "") {
-                    artImg.src = imgUrl;
-                    artImg.style.display = "block";
-                    artFallback.style.display = "none";
+                    artImg.src = imgUrl; artImg.style.display = "block"; artFallback.style.display = "none";
                 } else {
-                    artImg.style.display = "none";
-                    artFallback.style.display = "block";
+                    artImg.style.display = "none"; artFallback.style.display = "block";
                 }
                 
-                // Update Live Indicators
                 const statusIndicator = document.getElementById('listening-status');
+                const eqContainer = document.getElementById('eq-wrapper');
                 if (isNowPlaying) {
                     statusIndicator.innerHTML = `<span class="pulse-dot pulsing"></span>LIVE`;
                     statusIndicator.style.color = "var(--hacker-green)";
+                    eqContainer.style.opacity = "1";
                 } else {
                     statusIndicator.innerHTML = `<span class="pulse-dot" style="background-color: #555; box-shadow: none;"></span>IDLE`;
                     statusIndicator.style.color = "#888";
+                    eqContainer.style.opacity = "0.3";
                 }
             } catch (error) {
-                console.error('API Error:', error);
+                console.error('Telemetry Error:', error);
                 document.getElementById('track-title').innerText = "SIGNAL_LOST_TELEMETRY";
             }
         }
-        // Polls official server directly every 10 seconds for lightning fast feedback
-        setInterval(fetchLastFM, 10000);
+        setInterval(fetchLastFM, 7000);
     </script>
 </body>
 </html>
