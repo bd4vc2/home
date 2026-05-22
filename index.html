@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ICEY // TACTICAL_OS v2.8.0</title>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>ICEY // TACTICAL_OS v2.9.0</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
     <style>
         :root {
             --neon-blue: #00f2ff;
@@ -12,8 +15,10 @@
             --dark-void: #010812;
             --v-gold: #ffcc00;
             --hacker-green: #00ff99;
+            --alert-red: #ff3366;
             --glass-bright: rgba(255, 255, 255, 0.1);
             --glass-dark: rgba(0, 10, 20, 0.85);
+            --border-glow: rgba(0, 242, 255, 0.25);
         }
 
         body, html {
@@ -22,16 +27,22 @@
             color: #c0d1d4;
             font-family: 'Share Tech Mono', monospace;
             overflow: hidden;
+            user-select: none;
         }
 
-        /* DYNAMIC BACKGROUND */
+        /* TECH CRT SCANLINE EFFECT */
+        body::before {
+            content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 21, 0.06));
+            z-index: 999; background-size: 100% 3px, 6px 100%; pointer-events: none;
+        }
+
         .aero-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: 
-                linear-gradient(rgba(1, 8, 18, 0.7), rgba(1, 8, 18, 0.9)), 
+                linear-gradient(rgba(1, 8, 18, 0.75), rgba(1, 8, 18, 0.95)), 
                 url('image_5bb41f.jpg') no-repeat center center fixed;
-            background-size: cover;
-            z-index: -1;
+            background-size: cover; z-index: -1;
         }
 
         /* LOADING OVERLAY */
@@ -41,94 +52,106 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        .loader-text { font-family: 'Orbitron'; color: var(--neon-blue); letter-spacing: 5px; margin-bottom: 20px; }
+        .loader-text { font-family: 'Orbitron', sans-serif; color: var(--neon-blue); letter-spacing: 5px; margin-bottom: 20px; font-weight: 900; }
         .progress-rail { width: 300px; height: 2px; background: #111; position: relative; }
-        #progress-fill { width: 0%; height: 100%; background: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); transition: width 0.4s; }
+        #progress-fill { width: 0%; height: 100%; background: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); transition: width 0.3s; }
         #boot-status { font-size: 0.7rem; color: var(--v-gold); margin-top: 10px; font-style: italic; }
 
-        /* HEADER HUD */
+        /* HUD TOP PACKED WITH TELEMETRY */
         .hud-top {
             display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
-            padding: 10px 40px; border-bottom: 1px solid var(--neon-blue);
-            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(15px);
-            position: relative; z-index: 100;
+            padding: 12px 40px; border-bottom: 1px solid var(--neon-blue);
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(15px);
+            position: relative; z-index: 100; box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
         }
 
-        .version-box { font-family: 'Orbitron'; font-size: 0.75rem; color: var(--v-gold); font-weight: bold; }
-        .main-title { font-family: 'Orbitron'; font-weight: 900; font-size: 1.4rem; color: var(--neon-blue); letter-spacing: 6px; }
+        .version-box { font-family: 'Orbitron', sans-serif; font-size: 0.7rem; color: var(--v-gold); font-weight: bold; }
+        .main-title { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 1.4rem; color: var(--neon-blue); letter-spacing: 8px; text-align: center; text-shadow: 0 0 10px rgba(0,242,255,0.5); }
+        .hud-right { display: flex; justify-content: flex-end; gap: 20px; align-items: center; }
+        #clock { color: var(--neon-blue); font-weight: bold; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; }
+        #net-speed { color: var(--hacker-green); font-size: 0.75rem; border: 1px solid var(--hacker-green); padding: 2px 6px; border-radius: 3px; background: rgba(0,255,153,0.05); }
 
         /* DASHBOARD GRID */
         .grid-container {
-            display: grid; grid-template-columns: 320px 1fr 320px; gap: 20px;
-            padding: 25px; max-width: 1700px; margin: 0 auto;
+            display: grid; grid-template-columns: 330px 1fr 330px; gap: 20px;
+            padding: 20px; max-width: 1750px; margin: 0 auto;
             position: relative; z-index: 50;
-            opacity: 0; transform: scale(0.98); transition: 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+            opacity: 0; transform: scale(0.97); transition: 1s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .grid-container.active { opacity: 1; transform: scale(1); }
 
-        /* BOX STYLING */
+        /* CARD MODULES */
         .module {
-            background: var(--glass-dark);
-            border: 1px solid var(--border-glow);
-            border-radius: 4px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            backdrop-filter: blur(10px);
+            background: var(--glass-dark); border: 1px solid var(--border-glow);
+            border-radius: 4px; overflow: hidden; box-shadow: 0 10px 35px rgba(0,0,0,0.6);
+            backdrop-filter: blur(12px); margin-bottom: 15px; position: relative;
         }
 
         .module-header {
-            background: rgba(0, 242, 255, 0.2);
-            color: var(--neon-blue);
-            padding: 6px 15px;
-            font-family: 'Orbitron';
-            font-size: 0.7rem;
-            font-weight: bold;
-            border-bottom: 1px solid var(--border-glow);
-            display: flex; justify-content: space-between;
+            background: rgba(0, 242, 255, 0.12); color: var(--neon-blue);
+            padding: 8px 15px; font-family: 'Orbitron', sans-serif; font-size: 0.7rem;
+            font-weight: bold; border-bottom: 1px solid var(--border-glow);
+            display: flex; justify-content: space-between; align-items: center;
+            letter-spacing: 1px;
         }
 
-        .module-content { padding: 18px; }
+        .module-content { padding: 15px; }
+        .data-line { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 4px; font-size: 0.85rem; }
+        .tag-list { display: flex; flex-wrap: wrap; gap: 5px; }
+        .tag { background: rgba(0, 242, 255, 0.08); border: 1px solid var(--neon-blue); padding: 3px 6px; font-size: 0.65rem; color: var(--neon-blue); border-radius: 2px; }
 
-        /* LISTS & DATA */
-        .data-line { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 4px; }
-        .tag-list { display: flex; flex-wrap: wrap; gap: 6px; }
-        .tag { 
-            background: rgba(0, 242, 255, 0.1); border: 1px solid var(--neon-blue); 
-            padding: 3px 8px; font-size: 0.65rem; color: var(--neon-blue); border-radius: 2px;
-        }
+        /* FLEX #1: INTERACTIVE TERMINAL ENGINE WITH COMMAND BAR */
+        .terminal-box { display: flex; flex-direction: column; background: rgba(0, 3, 8, 0.6); border-radius: 3px; border: 1px solid rgba(0, 255, 153, 0.2); }
+        #live-log { height: 215px; overflow-y: hidden; font-size: 0.78rem; color: var(--hacker-green); text-shadow: 0 0 4px var(--hacker-green); line-height: 1.5; padding: 10px; box-sizing: border-box; }
+        .cli-input-wrapper { display: flex; background: rgba(0,0,0,0.5); border-top: 1px solid rgba(0, 255, 153, 0.2); padding: 6px 10px; align-items: center; }
+        .cli-prompt { color: var(--hacker-green); font-weight: bold; margin-right: 8px; font-size: 0.8rem; }
+        #cli-cmd { background: transparent; border: none; outline: none; color: #fff; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; flex: 1; }
 
-        /* TERMINAL LOG */
-        #live-log { height: 260px; overflow-y: hidden; font-size: 0.8rem; color: var(--hacker-green); text-shadow: 0 0 5px var(--hacker-green); }
+        /* FLEX #2: LIVE HARDWARE CPU CORE MATRIX COMPONENT */
+        .cpu-matrix-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; }
+        .cpu-core-block { background: rgba(255,255,255,0.03); border: 1px solid rgba(0, 242, 255, 0.1); border-radius: 2px; padding: 6px; text-align: center; }
+        .core-label { font-size: 0.6rem; color: #668899; display: block; margin-bottom: 3px; }
+        .core-bar-rail { width: 100%; height: 4px; background: rgba(0,0,0,0.5); position: relative; border-radius: 1px; overflow: hidden; }
+        .core-bar-fill { width: 12%; height: 100%; background: var(--neon-blue); transition: width 0.4s ease; }
+        .core-val-text { font-size: 0.65rem; font-weight: bold; margin-top: 2px; display: inline-block; color: #fff; }
 
-        /* BUTTONS */
+        /* MUSIC COUPLER STYLES */
+        .scrobble-count { color: var(--v-gold); font-weight: bold; }
+        #track-title { color: #fff; font-size: 0.95rem; font-weight: bold; margin: 4px 0; min-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: 0.5px; }
+        #track-artist { color: var(--neon-blue); font-size: 0.8rem; margin: 0 0 8px 0; min-height: 16px; }
+        .pulse-dot { display: inline-block; width: 7px; height: 7px; background-color: var(--hacker-green); border-radius: 50%; margin-right: 6px; box-shadow: 0 0 6px var(--hacker-green); }
+        .pulsing { animation: blink 1.4s infinite ease-in-out; }
+        @keyframes blink { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+
+        /* STANDARD BUTTON ENGINE */
         .btn {
-            display: block; width: 100%; padding: 12px; margin-bottom: 10px;
+            display: block; width: 100%; padding: 10px; margin-bottom: 8px; box-sizing: border-box;
             background: var(--glass-bright); border: 1px solid var(--neon-blue);
             color: #fff; text-decoration: none; text-align: center;
-            font-family: 'Orbitron'; font-size: 0.7rem; transition: 0.3s;
-            border-radius: 2px;
+            font-family: 'Orbitron', sans-serif; font-size: 0.65rem; transition: 0.25s;
+            border-radius: 2px; letter-spacing: 1px; font-weight: bold;
         }
-        .btn:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 20px var(--neon-blue); }
-
-        #clock { color: var(--neon-blue); font-weight: bold; text-align: right; }
-
+        .btn:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px var(--neon-blue); transform: translateX(2px); }
     </style>
 </head>
 <body>
 
     <div id="boot-screen">
-        <div class="loader-text">ICEY_OS // V2.8.0</div>
+        <div class="loader-text">ICEY_OS // V2.9.0</div>
         <div class="progress-rail"><div id="progress-fill"></div></div>
-        <div id="boot-status">Initializing 3080_Ti...</div>
+        <div id="boot-status">Initializing system assets...</div>
     </div>
 
     <div class="aero-bg"></div>
 
     <header class="hud-top">
-        <div class="version-box">VER: 2.8.0 // STABLE</div>
-        <div class="main-title">ICEY // COMMAND</div>
-        <div id="clock">00:00:00</div>
+        <div class="version-box">SYS_VER: 2.9.0 // CODENAME: GARGANTUA</div>
+        <div class="main-title">ICEY // TACTICAL_COMMAND</div>
+        <div class="hud-right">
+            <div id="net-speed">NET_LINK: CHECKING...</div>
+            <div id="clock">00:00:00 PM</div>
+        </div>
     </header>
 
     <main class="grid-container" id="dash">
@@ -137,7 +160,7 @@
                 <div class="module-header">USER_MANIFEST</div>
                 <div class="module-content">
                     <p style="font-size: 0.85rem; line-height: 1.6; margin: 0;">
-                        Architect of meme-rockets, survivor of the Subnautica depths, and keeper of the Montana ranch. Pushing hardware to the limit. 🍪
+                        Architect of meme-rockets, survivor of the Subnautica depths, and keeper of the Montana ranch. Pushing hardware limits. 🍪
                     </p>
                 </div>
             </div>
@@ -146,9 +169,49 @@
                 <div class="module-header">SYSTEM_LOADOUT</div>
                 <div class="module-content">
                     <div class="data-line"><span>CPU</span> <strong>i7-12700K</strong></div>
-                    <div class="data-line"><span>GPU</span> <strong style="color:var(--neon-blue)">RTX 3080 Ti</strong></div>
+                    <div class="data-line"><span>GPU</span> <strong style="color: var(--neon-blue);">RTX 3080 Ti</strong></div>
                     <div class="data-line"><span>RAM</span> <strong>32GB 3600MT/s</strong></div>
-                    <div class="data-line"><span>C_DRIVE</span> <strong id="drive-val">90.8 GB FREE</strong></div>
+                    <div class="data-line"><span>C_DRIVE</span> <strong>90.8 GB FREE</strong></div>
+                </div>
+            </div>
+
+            <div class="module" style="border-color: rgba(0, 242, 255, 0.4);">
+                <div class="module-header">
+                    <span>CPU_THREAD_MATRIX</span><span style="color: var(--neon-blue);" id="matrix-load">AVG: 4%</span>
+                </div>
+                <div class="module-content">
+                    <div class="cpu-matrix-grid" id="cpu-core-container">
+                        </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="column">
+            <div class="module" style="border-color: var(--hacker-green);">
+                <div class="module-header" style="background: rgba(0, 255, 153, 0.12); color: var(--hacker-green);">
+                    <span>COMMAND_SHELL_INTERACTION</span> <span id="shell-status" style="animation: blink 2s infinite;">ONLINE</span>
+                </div>
+                <div class="module-content" style="padding: 10px;">
+                    <div class="terminal-box">
+                        <div id="live-log">
+                            <div>&gt; ICE_OS CORE CORE SECURELY ANCHORED.</div>
+                            <div>&gt; Type <span style="color:#fff; font-weight:bold;">/help</span> below to access terminal arrays.</div>
+                        </div>
+                        <div class="cli-input-wrapper">
+                            <span class="cli-prompt">ICEY@SYS:~$</span>
+                            <input type="text" id="cli-cmd" placeholder="Enter routine matrix parameters..." autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="module">
+                <div class="module-header">MISSION_PARAMETERS</div>
+                <div class="module-content">
+                    <div class="data-line"><span style="color: var(--v-gold);">KERBAL SPACE PROGRAM</span> <span>Meme-Rocket Engineering</span></div>
+                    <div class="data-line"><span style="color: var(--v-gold);">SUBNAUTICA 2</span> <span>Deep-Sea Reconnaissance</span></div>
+                    <div class="data-line"><span style="color: var(--v-gold);">RED DEAD 2</span> <span>Frontier Justice Simulator</span></div>
+                    <div class="data-line"><span style="color: var(--v-gold);">FARM SIM 22</span> <span>Montana Ranch Management</span></div>
                 </div>
             </div>
 
@@ -167,59 +230,45 @@
         </div>
 
         <div class="column">
-            <div class="module" style="border-color: var(--hacker-green);">
-                <div class="module-header" style="background: rgba(0, 255, 153, 0.2); color: var(--hacker-green);">
-                    <span>ENCRYPTED_SIGNAL_FEED</span> <span>LIVE</span>
+            <div class="module" style="border-color: var(--neon-blue);">
+                <div class="module-header">
+                    <span>LIVE_AUDIO_LINK</span>
+                    <span id="listening-status"><span class="pulse-dot"></span>OFFLINE</span>
                 </div>
                 <div class="module-content">
-                    <div id="live-log"></div>
-                </div>
-            </div>
-
-            <div class="module">
-                <div class="module-header">MISSION_PARAMETERS</div>
-                <div class="module-content">
-                    <div class="data-line"><span style="color:var(--v-gold)">KERBAL SPACE PROGRAM</span> <span>Meme-Rocket Engineering</span></div>
-                    <div class="data-line"><span style="color:var(--v-gold)">SUBNAUTICA 2</span> <span>Deep-Sea Reconnaissance</span></div>
-                    <div class="data-line"><span style="color:var(--v-gold)">RED DEAD 2</span> <span>Frontier Justice Simulator</span></div>
-                    <div class="data-line"><span style="color:var(--v-gold)">FARM SIM 22</span> <span>Montana Ranch Management</span></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="column">
-            <div class="module">
-                <div class="module-header">STATUS</div>
-                <div class="module-content" style="text-align: center;">
-                    <div id="status-display" style="font-family: Orbitron; font-size: 1.2rem; color: var(--neon-blue);">IDLE_IN_ORBIT</div>
+                    <div style="font-size: 0.65rem; opacity: 0.5; letter-spacing: 1px; margin-bottom: 2px;">CURRENTLY_SPINNING:</div>
+                    <div id="track-title">CONNECTING_TELEMETRY...</div>
+                    <div id="track-artist">---</div>
+                    <div class="data-line" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;">
+                        <span>TOTAL_PLAYS</span> <span id="total-scrobbles" class="scrobble-count">0</span>
+                    </div>
                 </div>
             </div>
 
             <div class="module">
                 <div class="module-header">COMM_ARRAY</div>
                 <div class="module-content">
-                    <a href="https://www.youtube.com/@yeci_.1" class="btn">YOUTUBE_PRIMARY</a>
-                    <a href="https://www.roblox.com/users/4447690823/profile" class="btn">ROBLOX_LINK</a>
-                    <div style="font-size: 0.65rem; text-align: center; opacity: 0.5; margin-top: 10px;">
-                        ENCRYPTED_ID: ._icey1
-                    </div>
+                    <a href="https://www.youtube.com/@yeci_.1" class="btn" target="_blank">YOUTUBE_PRIMARY</a>
+                    <a href="https://www.roblox.com/users/4447690823/profile" class="btn" target="_blank">ROBLOX_LINK</a>
+                    <a href="https://www.last.fm/user/icy51" class="btn" target="_blank">LAST_FM_DOSSIER</a>
+                    <div style="font-size: 0.65rem; text-align: center; opacity: 0.4; margin-top: 8px;">ENCRYPTED_ID: ._icey1</div>
                 </div>
             </div>
 
             <div class="module">
                 <div class="module-header">VERSION_LOGS</div>
-                <div class="module-content" style="font-size: 0.7rem; color: #668899;">
-                    <div>v2.8.0: The Gargantua Build (Full Redesign)</div>
+                <div class="module-content" style="font-size: 0.7rem; color: rgb(102, 136, 153); line-height: 1.4;">
+                    <div>v2.9.0: CLI Interface & Hardware Core Array</div>
+                    <div>v2.8.0: The Last.fm Asynchronous Link</div>
                     <div>v2.7.0: Neo-Aero Startup Logic</div>
                     <div>v2.6.6: Hollywood Hacker Mode</div>
-                    <div>v2.6.4: Bio Dossier Launch</div>
                 </div>
             </div>
         </div>
     </main>
 
     <script>
-        // BOOT SEQUENCE LOGIC
+        // BOOT SYSTEM SEQUENCER
         const bootTips = [
             "Adding more struts...", "Ignoring the Kraken...", "Checking Reaper migration patterns...",
             "Stabilizing Gargantua orbit...", "Downloading additional VRAM...", "Syncing Ranch data...",
@@ -231,41 +280,45 @@
         const status = document.getElementById('boot-status');
         
         const bootInterval = setInterval(() => {
-            progress += Math.random() * 15;
-            if (progress > 100) progress = 100;
-            bar.style.width = progress + "%";
-            
-            if (Math.random() > 0.8) status.innerText = bootTips[Math.floor(Math.random() * bootTips.length)];
-
+            progress += Math.random() * 18;
             if (progress >= 100) {
+                progress = 100;
                 clearInterval(bootInterval);
                 setTimeout(() => {
                     document.getElementById('boot-screen').style.display = 'none';
                     document.getElementById('dash').classList.add('active');
-                }, 500);
+                    // Launch engine systems
+                    initMatrix();
+                    fetchLastFM();
+                    fetchNetworkSpeed();
+                }, 400);
             }
-        }, 350);
+            bar.style.width = progress + "%";
+            if (Math.random() > 0.75) {
+                status.innerText = bootTips[Math.floor(Math.random() * bootTips.length)];
+            }
+        }, 200);
 
-        // CLOCK
+        // CLOCK DATA ENGINE
         setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
 
-        // TERMINAL FEED
+        // EXTRA DEEP REAL AUTOMATION FLEX #3: WEB API NETWORK SPEEDOMETER
+        function fetchNetworkSpeed() {
+            const netDisplay = document.getElementById('net-speed');
+            if (navigator.connection) {
+                const conn = navigator.connection;
+                const speed = conn.downlink ? `${conn.downlink} MBPS` : 'ACTIVE';
+                const type = conn.effectiveType ? conn.effectiveType.toUpperCase() : 'LAN';
+                netDisplay.innerText = `NET_LINK: ${speed} // ${type}`;
+            } else {
+                netDisplay.innerText = "NET_LINK: SECURE // GB_LAN";
+            }
+        }
+        // Keep querying background network hardware frame every 30s
+        setInterval(fetchNetworkSpeed, 30000);
+
+        // RE-WRITTEN TERMINAL LOOP DICTIONARY TELEMETRY
         const log = document.getElementById('live-log');
         const logEntries = [
-            "> BOOT_COMPLETE. 3080_Ti STABLE.", "> WARNING: Kraken detected near Jool.",
-            "> Re-routing power to Montana Ranch sector...", "> Searching for unused struts...",
-            "> Downloading cookie.zip... [SUCCESS]", "> Scaling black hole accretion disk...",
-            "> Arthur_Morgan.exe is ready.", "> Subnautica Depth Limit: REACHED.",
-            "> i7-12700K Load: 4% (Bored).", "> Storage space: CRITICAL (Just kidding).",
-            "> Synchronizing with Gargantua timeline..."
-        ];
-
-        setInterval(() => {
-            const entry = document.createElement('div');
-            entry.innerText = logEntries[Math.floor(Math.random() * logEntries.length)];
-            log.appendChild(entry);
-            if (log.childNodes.length > 13) log.removeChild(log.firstChild);
-        }, 2000);
-    </script>
-</body>
-</html>
+            "> WARNING: Kraken detected near Jool sector.", "> Re-routing primary aux-grid to Montana Ranch...",
+            "> Scanning mainframe database for unallocated struts...", "> Downloading cookie.tar.gz... [SUCCESS]",
