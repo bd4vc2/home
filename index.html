@@ -4,191 +4,205 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ICEY // CENTRAL_HUB_OS v4.0.0</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     
     <style>
+        /* Frutiger Aero / Windows Vista & 7 Aesthetic Palette */
         :root {
-            --neon-blue: #00f2ff;
-            --aero-cyan: rgba(0, 242, 255, 0.15);
-            --dark-void: #010610;
-            --v-gold: #ffcc00;
-            --hacker-green: #00ff99;
-            --alert-red: #ff3366;
-            --glass-bright: rgba(255, 255, 255, 0.06);
-            --glass-dark: rgba(2, 8, 18, 0.88);
-            --border-glow: rgba(0, 242, 255, 0.18);
+            --glass-base: rgba(180, 225, 250, 0.45);
+            --glass-reflect: linear-gradient(180deg, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0.2) 45%, rgba(240,250,255,0) 50%, rgba(255,255,255,0.1) 100%);
+            --aero-blue: #0066cc;
+            --aero-green: #22aa33;
+            --aero-text: #1e293b;
+            --border-light: rgba(255, 255, 255, 0.7);
+            --border-dark: rgba(100, 150, 180, 0.5);
+            --window-shadow: 0 8px 24px rgba(0, 30, 60, 0.3);
         }
 
         body, html {
             margin: 0; padding: 0; height: 100%;
-            background-color: var(--dark-void);
-            color: #c0d1d4;
-            font-family: 'Share Tech Mono', monospace;
+            /* Vista/Aero style abstract aurora background */
+            background: radial-gradient(circle at 80% 20%, #8be2ec 0%, #3ca0e7 40%, #1c5ba4 100%);
+            background-attachment: fixed;
+            color: var(--aero-text);
+            font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
             overflow-y: auto;
-            user-select: none;
         }
 
-        /* CRT SCANLINE EFFECT */
+        /* IE7/Vista glass sheen overlay across the background */
         body::before {
             content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.18) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 21, 0.02));
-            z-index: 999; background-size: 100% 4px, 6px 100%; pointer-events: none;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 50%);
+            z-index: -1; pointer-events: none;
         }
 
-        #bg-canvas {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-        }
-
-        /* EMERGENCY ALARM OVERLAY */
-        #hazard-overlay {
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background: repeating-linear-gradient(45deg, rgba(255,51,102,0.08), rgba(255,51,102,0.08) 15px, rgba(0,0,0,0) 15px, rgba(0,0,0,0) 30px);
-            z-index: 900; opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
-        }
-        @keyframes hazard-pulse { 0%, 100% { background-color: rgba(255,51,102,0.01); } 50% { background-color: rgba(255,51,102,0.12); } }
-        .critical-alert #hazard-overlay { opacity: 1; animation: hazard-pulse 1.2s infinite; }
-
-        /* LOADING OVERLAY */
+        /* BOOT SCREEN (Classic Windows 7 Startup style) */
         #boot-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000104; z-index: 9999;
+            background: #000; z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
+        .loader-text { 
+            font-family: "Segoe UI", sans-serif; 
+            color: #ffffff; 
+            font-size: 1.5rem; 
+            margin-bottom: 30px; 
+            letter-spacing: 1px;
+            font-weight: 300;
+        }
+        .progress-rail { 
+            width: 280px; 
+            height: 12px; 
+            background: #222; 
+            border: 1px solid #444; 
+            border-radius: 6px; 
+            position: relative; 
+            overflow: hidden; 
+        }
+        #progress-fill { 
+            width: 0%; 
+            height: 100%; 
+            /* Windows 7 glossy green loading bar bar */
+            background: linear-gradient(180deg, #a2e048 0%, #60af13 45%, #4c8e0b 50%, #70c918 100%);
+            border-radius: 5px;
+            transition: width 0.08s linear; 
+        }
+        #boot-status { font-size: 0.8rem; color: #888; margin-top: 15px; }
 
-        .loader-text { font-family: 'Orbitron', sans-serif; color: var(--neon-blue); letter-spacing: 6px; margin-bottom: 20px; font-weight: 900; text-shadow: 0 0 12px rgba(0,242,255,0.5); }
-        .progress-rail { width: 340px; height: 4px; background: #050d18; position: relative; border-radius: 2px; overflow: hidden; }
-        #progress-fill { width: 0%; height: 100%; background: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); transition: width 0.08s linear; }
-        #boot-status { font-size: 0.75rem; color: var(--v-gold); margin-top: 12px; font-style: italic; letter-spacing: 1px; }
-
-        /* HUD TOP */
+        /* INTERNET EXPLORER STYLE TOP APPLICATION BAR */
         .hud-top {
             display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
-            padding: 14px 30px; border-bottom: 1px solid var(--border-glow);
-            background: rgba(1, 4, 12, 0.92); backdrop-filter: blur(20px);
-            position: relative; z-index: 100; box-shadow: 0 4px 30px rgba(0,0,0,0.6);
+            padding: 10px 20px; 
+            border-bottom: 1px solid var(--border-light);
+            background: var(--glass-base);
+            background-image: var(--glass-reflect);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            position: relative; z-index: 100; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.6);
         }
 
-        .version-box { font-family: 'Orbitron', sans-serif; font-size: 0.68rem; color: var(--v-gold); font-weight: bold; letter-spacing: 1px; }
-        .main-title { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 1.4rem; color: var(--neon-blue); letter-spacing: 6px; text-align: center; text-shadow: 0 0 10px rgba(0,242,255,0.5); }
-        .hud-right { display: flex; justify-content: flex-end; gap: 20px; align-items: center; }
-        #clock { color: var(--neon-blue); font-weight: bold; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; letter-spacing: 1px; }
-        #net-speed { color: var(--hacker-green); font-size: 0.75rem; border: 1px solid rgba(0,255,153,0.25); padding: 2px 8px; border-radius: 3px; background: rgba(0,255,153,0.04); }
+        .version-box { font-size: 0.8rem; color: #2e4a62; font-weight: 600; }
+        .main-title { font-weight: 700; font-size: 1.25rem; color: #003377; text-align: center; text-shadow: 0 1px 2px rgba(255,255,255,0.8); }
+        .hud-right { display: flex; justify-content: flex-end; gap: 15px; align-items: center; font-size: 0.85rem; color: #2e4a62; }
+        #clock { font-weight: bold; }
+        #net-speed { background: rgba(255,255,255,0.5); padding: 2px 8px; border-radius: 10px; border: 1px solid var(--border-dark); }
 
-        /* DASHBOARD GRID */
+        /* WINDOWS SIDEBAR / DASHBOARD GRID */
         .grid-container {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
-            padding: 20px; max-width: 1920px; margin: 0 auto;
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px;
+            padding: 25px; max-width: 1400px; margin: 0 auto;
             position: relative; z-index: 50;
-            opacity: 0; transform: translateY(10px); transition: opacity 0.8s ease, transform 0.8s ease;
+            opacity: 0; transition: opacity 0.5s ease;
         }
-        @media(max-width: 1400px) { .grid-container { grid-template-columns: repeat(2, 1fr); } }
-        @media(max-width: 800px) { .grid-container { grid-template-columns: 1fr; } }
+        @media(max-width: 1200px) { .grid-container { grid-template-columns: repeat(2, 1fr); } }
+        @media(max-width: 750px) { .grid-container { grid-template-columns: 1fr; } }
 
-        .grid-container.active { opacity: 1; transform: translateY(0); }
+        .grid-container.active { opacity: 1; }
 
-        /* CARD MODULES */
+        /* AERO GLASS WINDOWS FRAME (VISTA/7 STYLE) */
         .module {
-            background: var(--glass-dark); border: 1px solid var(--border-glow);
-            border-radius: 4px; overflow: hidden; box-shadow: 0 12px 30px rgba(0,0,0,0.6);
-            backdrop-filter: blur(15px); margin-bottom: 20px; position: relative;
-            display: flex; flex-direction: column;
-            transition: border-color 0.35s ease, box-shadow 0.35s ease;
+            background: var(--glass-base);
+            background-image: var(--glass-reflect);
+            border-top: 1px solid var(--border-light);
+            border-left: 1px solid var(--border-light);
+            border-right: 1px solid var(--border-dark);
+            border-bottom: 1px solid var(--border-dark);
+            border-radius: 8px; overflow: hidden; 
+            box-shadow: var(--window-shadow), inset 0 1px 1px rgba(255,255,255,0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            margin-bottom: 10px; display: flex; flex-direction: column;
         }
-        .module:hover { border-color: rgba(0, 242, 255, 0.35); box-shadow: 0 12px 35px rgba(0, 242, 255, 0.04); }
 
+        /* Classic Windows Titlebar */
         .module-header {
-            background: rgba(0, 242, 255, 0.04); color: var(--neon-blue);
-            padding: 10px 14px; font-family: 'Orbitron', sans-serif; font-size: 0.72rem;
-            font-weight: 700; border-bottom: 1px solid var(--border-glow);
+            padding: 8px 12px; font-size: 0.85rem;
+            font-weight: 700; color: #002255;
+            text-shadow: 0 1px 1px rgba(255,255,255,0.6);
+            border-bottom: 1px solid rgba(255,255,255,0.3);
             display: flex; justify-content: space-between; align-items: center;
-            letter-spacing: 1.2px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
         }
 
-        .module-content { padding: 15px; flex: 1; }
-        .data-line { display: flex; justify-content: space-between; margin-bottom: 9px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 5px; font-size: 0.82rem; }
-        .data-line span { color: #8fa3a6; }
-
-        /* INTERACTIVE TERMINAL */
-        .terminal-box { display: flex; flex-direction: column; background: rgba(0, 3, 8, 0.75); border-radius: 4px; border: 1px solid rgba(0, 255, 153, 0.15); }
-        #live-log { height: 160px; overflow-y: auto; font-size: 0.8rem; color: var(--hacker-green); text-shadow: 0 0 4px rgba(0, 255, 153, 0.3); line-height: 1.5; padding: 10px; box-sizing: border-box; }
-        #live-log::-webkit-scrollbar { width: 4px; }
-        #live-log::-webkit-scrollbar-thumb { background: rgba(0, 255, 153, 0.15); }
-        .cli-input-wrapper { display: flex; background: rgba(0,0,0,0.5); border-top: 1px solid rgba(0, 255, 153, 0.15); padding: 8px 12px; align-items: center; }
-        .cli-prompt { color: var(--hacker-green); font-weight: bold; margin-right: 8px; font-size: 0.82rem; }
-        #cli-cmd { background: transparent; border: none; outline: none; color: #fff; font-family: 'Share Tech Mono', monospace; font-size: 0.82rem; flex: 1; }
-
-        /* LIVE CPU MATRIX GRID */
-        .cpu-matrix-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 4px; }
-        .cpu-core-block { background: rgba(255,255,255,0.01); border: 1px solid rgba(0, 242, 255, 0.05); border-radius: 2px; padding: 5px; text-align: center; }
-        .core-label { font-size: 0.58rem; color: #5c7785; display: block; margin-bottom: 3px; }
-        .core-bar-rail { width: 100%; height: 4px; background: rgba(0,0,0,0.5); position: relative; border-radius: 1px; overflow: hidden; }
-        .core-bar-fill { width: 0%; height: 100%; background: var(--neon-blue); transition: width 0.25s cubic-bezier(0.1, 0.8, 0.3, 1), background-color 0.25s; }
-        .core-val-text { font-size: 0.62rem; font-weight: bold; margin-top: 3px; display: inline-block; color: #fff; }
-
-        /* IOT MATRIX CONTROLS */
-        .iot-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.02); font-size: 0.82rem; }
-        .status-pill { font-size: 0.65rem; font-weight: bold; padding: 2px 6px; border-radius: 2px; text-transform: uppercase; }
-        .pill-green { background: rgba(0,255,153,0.1); color: var(--hacker-green); border: 1px solid rgba(0,255,153,0.3); }
-        .pill-red { background: rgba(255,51,102,0.1); color: var(--alert-red); border: 1px solid rgba(255,51,102,0.3); }
-        .pill-gold { background: rgba(255,204,0,0.1); color: var(--v-gold); border: 1px solid rgba(255,204,0,0.3); }
-
-        /* AUDIO NODE STYLES */
-        .audio-link-content { display: flex; gap: 12px; align-items: center; }
-        .album-art-wrapper { width: 56px; height: 56px; border: 1px solid var(--border-glow); background: #020710; position: relative; display: flex; align-items: center; justify-content: center; border-radius: 3px; overflow: hidden; flex-shrink: 0; }
-        #album-art { width: 100%; height: 100%; object-fit: cover; display: none; }
-        .art-fallback { font-size: 1.2rem; color: rgba(0, 242, 255, 0.2); font-weight: bold; font-family: 'Orbitron', sans-serif; animation: pulse-slow 3s infinite ease-in-out; }
-        @keyframes pulse-slow { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+        /* Inner standard client window area */
+        .module-content { 
+            padding: 15px; flex: 1; 
+            background: rgba(255, 255, 255, 0.75);
+            box-shadow: inset 0 1px 4px rgba(0,0,0,0.1);
+        }
         
-        .track-metadata { flex: 1; min-width: 0; }
-        .scrobble-count { color: var(--v-gold); font-weight: bold; }
-        #track-title { color: #fff; font-size: 0.9rem; font-weight: bold; margin: 1px 0 3px 0; min-height: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: 0.5px; }
-        #track-artist { color: var(--neon-blue); font-size: 0.78rem; margin: 0; min-height: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .pulse-dot { display: inline-block; width: 6px; height: 6px; background-color: var(--hacker-green); border-radius: 50%; margin-right: 6px; box-shadow: 0 0 5px var(--hacker-green); }
-        .pulsing { animation: blink 1.4s infinite ease-in-out; }
-        @keyframes blink { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+        .data-line { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; font-size: 0.85rem; }
+        .data-line span { color: #475569; }
 
-        /* LIVE TELEMETRY PING GRAPH GRAPHICS */
-        .ping-container { display: flex; align-items: flex-end; height: 42px; gap: 3px; padding-top: 8px; border-bottom: 1px solid rgba(255,255,255,0.04); }
-        .ping-bar { flex: 1; background: rgba(0, 242, 255, 0.12); height: 10%; transition: height 0.4s cubic-bezier(0.075, 0.82, 0.165, 1); }
+        /* STANDARD WINDOWS INPUTS & TERMINAL */
+        .terminal-box { display: flex; flex-direction: column; background: #ffffff; border: 1px solid #a0a0a0; border-radius: 3px; }
+        #live-log { height: 140px; overflow-y: auto; font-size: 0.85rem; font-family: 'Consolas', 'Courier New', monospace; color: #333; line-height: 1.4; padding: 8px; box-sizing: border-box; }
+        .cli-input-wrapper { display: flex; background: #f0f0f0; border-top: 1px solid #ccc; padding: 6px; align-items: center; }
+        .cli-prompt { color: var(--aero-blue); font-weight: bold; margin-right: 6px; font-size: 0.85rem; font-family: monospace; }
+        #cli-cmd { background: #fff; border: 1px solid #bbb; padding: 2px 4px; color: #000; font-family: sans-serif; font-size: 0.85rem; flex: 1; }
 
-        /* WAVEFORM SIMULATOR EQ CONTAINER */
-        .eq-container { display: flex; justify-content: space-between; align-items: flex-end; height: 20px; margin-top: 12px; gap: 2px; }
-        .eq-bar { width: 6%; height: 15%; background: var(--hacker-green); transition: height 0.12s ease; box-shadow: 0 0 3px rgba(0, 255, 153, 0.15); }
-
-        /* BUTTONS */
-        .btn {
-            display: block; width: 100%; padding: 10px; margin-bottom: 8px; box-sizing: border-box;
-            background: var(--glass-bright); border: 1px solid rgba(0, 242, 255, 0.35);
-            color: #fff; text-decoration: none; text-align: center;
-            font-family: 'Orbitron', sans-serif; font-size: 0.65rem; transition: all 0.22s ease;
-            border-radius: 3px; letter-spacing: 1.2px; font-weight: bold; cursor: pointer;
+        /* CPU BARS (Glossy Green Bars) */
+        .cpu-matrix-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .cpu-core-block { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .core-label { font-size: 0.7rem; color: #64748b; font-weight: bold; display: block; margin-bottom: 4px; }
+        .core-bar-rail { width: 100%; height: 10px; background: #e2e8f0; border-radius: 5px; border: 1px solid #cbd5e1; position: relative; overflow: hidden; }
+        .core-bar-fill { 
+            width: 0%; height: 100%; 
+            background: linear-gradient(180deg, #5cd65c 0%, #2eb82e 50%, #248f24 100%);
+            transition: width 0.3s ease; 
         }
-        .btn:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 12px rgba(0, 242, 255, 0.35); transform: translateX(2px); border-color: var(--neon-blue); }
+        .core-val-text { font-size: 0.75rem; font-weight: bold; margin-top: 2px; display: inline-block; color: #334155; }
+
+        /* STATUS PILLS */
+        .status-pill { font-size: 0.7rem; font-weight: bold; padding: 2px 8px; border-radius: 12px; border: 1px solid; }
+        .pill-green { background: #e6f4ea; color: #137333; border-color: #dadce0; }
+        .pill-red { background: #fce8e6; color: #c5221f; border-color: #dadce0; }
+
+        /* MEDIA AREA */
+        .audio-link-content { display: flex; gap: 12px; align-items: center; }
+        .album-art-wrapper { width: 50px; height: 50px; border: 1px solid #99bbee; background: linear-gradient(135deg, #ffffff, #ddeeff); display: flex; align-items: center; justify-content: center; border-radius: 4px; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .art-fallback { font-size: 1.5rem; color: #4ba3e3; }
+        .track-metadata { flex: 1; min-width: 0; }
+        #track-title { color: #111; font-size: 0.9rem; font-weight: bold; margin: 0 0 2px 0; }
+        #track-artist { color: var(--aero-blue); font-size: 0.8rem; margin: 0; }
+
+        /* CLEAN AERO SKEUOMORPHIC BUTTONS */
+        .btn {
+            display: block; width: 100%; padding: 8px 12px; margin-bottom: 8px; box-sizing: border-box;
+            background: linear-gradient(180deg, #ffffff 0%, #eaeaea 40%, #dcdcdc 50%, #f3f3f3 100%);
+            border: 1px solid #707070;
+            color: #333; text-decoration: none; text-align: center;
+            font-size: 0.8rem; font-weight: 500; font-family: sans-serif;
+            border-radius: 4px; cursor: pointer;
+            box-shadow: inset 0 1px 0 #fff, 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .btn:hover { 
+            background: linear-gradient(180deg, #f2f8ff 0%, #e1f0ff 40%, #ccdfff 50%, #e5f0ff 100%);
+            border-color: #3c7fb1;
+            color: #000;
+            box-shadow: inset 0 1px 0 #fff, 0 0 5px rgba(82, 168, 236, 0.6);
+        }
+        .btn:active {
+            background: linear-gradient(180deg, #e5f0ff 0%, #ccdfff 40%, #b3cfff 50%, #d9e6ff 100%);
+        }
         
         .macro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .btn-mini { padding: 7px; margin-bottom: 0; font-size: 0.6rem; border-color: rgba(0, 255, 153, 0.25); }
-        .btn-mini:hover { background: var(--hacker-green); border-color: var(--hacker-green); }
+        .btn-mini { padding: 6px; margin-bottom: 0; font-size: 0.75rem; }
     </style>
 </head>
 <body>
 
-    <div id="hazard-overlay"></div>
-    <canvas id="bg-canvas"></canvas>
-
     <div id="boot-screen">
-        <div class="loader-text">ICEY_OS // CORE_V4.0</div>
+        <div class="loader-text">Starting Windows...</div>
         <div class="progress-rail"><div id="progress-fill"></div></div>
-        <div id="boot-status">Initializing central intelligence array...</div>
+        <div id="boot-status">Loading ICEY_OS array parameters...</div>
     </div>
 
     <header class="hud-top">
-        <div class="version-box">SYS_NODE: ARCH_CENTRAL // SECURITY: ACTIVE</div>
-        <div class="main-title">ICEY // COMMAND_HOME_HUB</div>
+        <div class="version-box">System Security Central Node</div>
+        <div class="main-title">ICEY // HOME COMMAND CENTER</div>
         <div class="hud-right">
-            <div id="net-speed">HOME_NET: SECURE // 940 MBPS</div>
+            <div id="net-speed">940 Mbps Local Link</div>
             <div id="clock">00:00:00 PM</div>
         </div>
     </header>
@@ -196,81 +210,67 @@
     <main class="grid-container" id="dash">
         <div class="column">
             <div class="module">
-                <div class="module-header">USER_MANIFEST</div>
+                <div class="module-header">User Profile Manifest</div>
                 <div class="module-content">
-                    <p style="font-size: 0.85rem; line-height: 1.5; margin: 0; color: #d1dfdf;">
+                    <p style="font-size: 0.85rem; line-height: 1.4; margin: 0; color: #334155;">
                         I like cookies and food, KSP, RDR2, Nintendo, gaming, space, and a bunch of other cool stuff. Welcome to my central home interface.
                     </p>
                 </div>
             </div>
 
-            <div class="module" style="border-color: rgba(255, 51, 102, 0.3);">
-                <div class="module-header" style="color: var(--alert-red);">FACILITY_SECURITY_MATRIX</div>
+            <div class="module">
+                <div class="module-header">Facility Security Control</div>
                 <div class="module-content">
-                    <div class="iot-row"><span>PERIMETER_LASERS</span><span class="status-pill pill-green" id="sec-lasers">ENGAGED</span></div>
-                    <div class="iot-row"><span>MAIN_VAULT_LOCK</span><span class="status-pill pill-green" id="sec-vault">SECURED</span></div>
-                    <div class="iot-row"><span>IP_CAM_FEEDS</span><span class="status-pill pill-green">STREAMING</span></div>
-                    <div class="iot-row"><span>THREAT_INDEX</span><span class="status-pill pill-green" id="sec-threat">0.00%</span></div>
+                    <div class="data-line"><span>Perimeter Status</span><span class="status-pill pill-green">Engaged</span></div>
+                    <div class="data-line"><span>Main Vault Lock</span><span class="status-pill pill-green">Secured</span></div>
+                    <div class="data-line"><span>IP Cam Feeds</span><span class="status-pill pill-green">Streaming</span></div>
+                    <div class="data-line"><span>Threat Indexes</span><span class="status-pill pill-green">0.00%</span></div>
                 </div>
             </div>
 
             <div class="module">
-                <div class="module-header">QUICK_MACRO_ARR</div>
+                <div class="module-header">Quick System Macros</div>
                 <div class="module-content">
                     <div class="macro-grid">
-                        <button class="btn btn-mini" onclick="runMacro('Stealth Mode')">STEALTH_ON</button>
-                        <button class="btn btn-mini" onclick="runMacro('Daylight Cycle')">CYCLE_DAY</button>
-                        <button class="btn btn-mini" style="border-color:rgba(255,51,102,0.4);" onclick="runMacro('Emergency lockdown manual trigger')">LOCKDOWN</button>
-                        <button class="btn btn-mini" style="border-color:var(--v-gold);" onclick="runMacro('Reset Environment')">SYS_RESET</button>
+                        <button class="btn btn-mini" onclick="alert('Stealth Mode Triggered')">Stealth On</button>
+                        <button class="btn btn-mini" onclick="alert('Daylight Cycle Triggered')">Cycle Day</button>
+                        <button class="btn btn-mini" onclick="alert('Emergency Lockdown Triggered')">Lockdown</button>
+                        <button class="btn btn-mini" onclick="location.reload()">System Reset</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="column">
-            <div class="module" id="shell-module" style="border-color: rgba(0, 255, 153, 0.35);">
-                <div class="module-header" id="shell-header" style="background: rgba(0, 255, 153, 0.05); color: var(--hacker-green);">
-                    <span>COMMAND_SHELL_INTERACTION</span> <span id="shell-status" style="animation: blink 2s infinite;">ONLINE</span>
-                </div>
-                <div class="module-content" style="padding: 12px;">
+            <div class="module">
+                <div class="module-header">Command Interaction Prompt</div>
+                <div class="module-content">
                     <div class="terminal-box">
                         <div id="live-log">
-                            <div>&gt; ICE_OS INTELLIGENCE CORE ONLINE & SECURE.</div>
-                            <div>&gt; Type <span style="color:#fff; font-weight:bold;">/help</span> to access central automated routines.</div>
+                            <div>Windows Terminal Command Engine Online.</div>
+                            <div>Ready for entry parameters...</div>
                         </div>
                         <div class="cli-input-wrapper">
-                            <span class="cli-prompt">ICEY@HOME_HUB:~$</span>
-                            <input type="text" id="cli-cmd" placeholder="Enter peripheral automation token parameters..." autocomplete="off">
+                            <span class="cli-prompt">C:\&gt;</span>
+                            <input type="text" id="cli-cmd" placeholder="Type system request token parameters...">
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <div class="module" style="border-color: rgba(255, 204, 0, 0.35);">
-                <div class="module-header">
-                    <span>REMOTE_PING_MATRIX</span> <span id="ping-display" style="color: var(--v-gold);">24ms</span>
-                </div>
-                <div class="module-content" style="padding-top: 5px;">
-                    <div class="ping-container" id="graph-container"></div>
                 </div>
             </div>
         </div>
 
         <div class="column">
-            <div class="module" style="border-color: rgba(0, 242, 255, 0.25);">
-                <div class="module-header">CLIMATE_ZONE_MONITOR</div>
+            <div class="module">
+                <div class="module-header">Climate Zone Metrics</div>
                 <div class="module-content">
-                    <div class="iot-row"><span>SERVER_ROOM</span><strong id="env-server" style="color:var(--neon-blue);">19.4°C // 42% RH</strong></div>
-                    <div class="iot-row"><span>PRIMARY_LOUNGE</span><strong id="env-lounge">22.1°C // 48% RH</strong></div>
-                    <div class="iot-row"><span>MECHANICAL_LAB</span><strong id="env-lab">20.8°C // 51% RH</strong></div>
-                    <div class="iot-row"><span>HVAC_COMPRESSOR</span><span class="status-pill pill-green" id="env-hvac">STABLE // RUNNING</span></div>
+                    <div class="data-line"><span>Server Room</span><strong id="env-server">19.4°C // 42% RH</strong></div>
+                    <div class="data-line"><span>Primary Lounge</span><strong id="env-lounge">22.1°C // 48% RH</strong></div>
+                    <div class="data-line"><span>Mechanical Lab</span><strong id="env-lab">20.8°C // 51% RH</strong></div>
                 </div>
             </div>
 
-            <div class="module" id="cpu-module" style="border-color: rgba(0, 242, 255, 0.25);">
-                <div class="module-header">
-                    <span>CPU_THREAD_MATRIX</span><span style="color: var(--neon-blue);" id="matrix-load">AVG: 4%</span>
-                </div>
+            <div class="module">
+                <div class="module-header">CPU Core Thread Load</div>
                 <div class="module-content">
                     <div class="cpu-matrix-grid" id="cpu-core-container"></div>
                 </div>
@@ -278,149 +278,41 @@
         </div>
 
         <div class="column">
-            <div class="module" style="border-color: rgba(0, 242, 255, 0.25);">
-                <div class="module-header">
-                    <span>LIVE_AUDIO_LINK</span>
-                    <span id="listening-status"><span class="pulse-dot"></span>OFFLINE</span>
-                </div>
+            <div class="module">
+                <div class="module-header">Media Player Link</div>
                 <div class="module-content">
                     <div class="audio-link-content">
                         <div class="album-art-wrapper">
-                            <div class="art-fallback" id="art-fallback">♫</div>
-                            <img id="album-art" alt="Album Cover">
+                            <div class="art-fallback">♫</div>
                         </div>
                         <div class="track-metadata">
-                            <div style="font-size: 0.58rem; opacity: 0.5; letter-spacing: 1px;">TELEMETRY_FEED:</div>
-                            <div id="track-title">CONNECTING...</div>
-                            <div id="track-artist">---</div>
+                            <div id="track-title">Media Connection</div>
+                            <div id="track-artist">Waiting for Stream...</div>
                         </div>
                     </div>
-                    
-                    <div class="eq-container" id="eq-wrapper">
-                        <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
-                        <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
-                        <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
-                        <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
-                    </div>
-
-                    <div class="data-line" style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;">
-                        <span>TOTAL_PLAYS</span> <span id="total-scrobbles" class="scrobble-count">0</span>
-                    </div>
                 </div>
             </div>
 
             <div class="module">
-                <div class="module-header">COMM_ARRAY_LINKS</div>
+                <div class="module-header">Communication Hub Resource Links</div>
                 <div class="module-content">
-                    <a href="https://www.youtube.com/@yeci_.1" class="btn" target="_blank">YOUTUBE_PRIMARY</a>
-                    <a href="https://www.roblox.com/users/4447690823/profile" class="btn" target="_blank">ROBLOX_LINK</a>
-                    <a href="https://www.last.fm/user/icy51" class="btn" target="_blank">LAST_FM_PROFILE</a>
-                    <div style="font-size: 0.68rem; text-align: center; opacity: 0.5; margin-top: 8px; letter-spacing: 0.5px;">ENCRYPTED_ID: ._icey1</div>
-                </div>
-            </div>
-
-            <div class="module">
-                <div class="module-header">ATMOSPHERIC_RADAR</div>
-                <div class="module-content" style="font-size: 0.8rem;">
-                    <div class="data-line"><span>OUTSIDE_TEMP</span> <strong id="weather-temp">28.4°C</strong></div>
-                    <div class="data-line"><span>BAROMETER</span> <strong>1014 hPa</strong></div>
-                    <div class="data-line"><span>CROSSWINDS</span> <strong id="weather-wind">14.2 km/h NW</strong></div>
-                    <div class="data-line"><span>SAFETY_RADIAL</span> <span class="status-pill pill-green" id="weather-status">OPTIMAL</span></div>
+                    <a href="https://www.youtube.com/@yeci_.1" class="btn" target="_blank">YouTube Channel</a>
+                    <a href="https://www.roblox.com/users/4447690823/profile" class="btn" target="_blank">Roblox Profile</a>
+                    <a href="https://www.last.fm/user/icy51" class="btn" target="_blank">Last.fm Profile</a>
+                    <div style="font-size: 0.75rem; text-align: center; opacity: 0.7; margin-top: 8px;">User Key Signature: ._icey1</div>
                 </div>
             </div>
         </div>
     </main>
 
     <script>
-        // BACKGROUND CORE CANVAS MATRIX ENGINE (WITH NODE CONNECTIONS & MOUSE INTERACTION)
-        const canvas = document.getElementById('bg-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-        let mouse = { x: null, y: null, radius: 110 };
-        
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; });
-        window.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
-        resizeCanvas();
-
-        for(let i=0; i<50; i++) {
-            particles.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                size: Math.random() * 1.8 + 0.6,
-                speedX: Math.random() * 0.25 - 0.125,
-                speedY: Math.random() * -0.4 - 0.08
-            });
-        }
-
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            let gradient = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, Math.max(canvas.width, canvas.height));
-            gradient.addColorStop(0, '#050d18');
-            gradient.addColorStop(1, '#01040a');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            for (let a = 0; a < particles.length; a++) {
-                for (let b = a; b < particles.length; b++) {
-                    let dx = particles[a].x - particles[b].x;
-                    let dy = particles[a].y - particles[b].y;
-                    let distance = Math.sqrt(dx * dx + dy * dy);
-                    if (distance < 120) {
-                        let opacity = (1 - (distance / 120)) * 0.1;
-                        ctx.strokeStyle = `rgba(0, 242, 255, ${opacity})`;
-                        ctx.lineWidth = 0.6;
-                        ctx.beginPath();
-                        ctx.moveTo(particles[a].x, particles[a].y);
-                        ctx.lineTo(particles[b].x, particles[b].y);
-                        ctx.stroke();
-                    }
-                }
-            }
-
-            ctx.fillStyle = 'rgba(0, 242, 255, 0.25)';
-            particles.forEach(p => {
-                p.x += p.speedX; p.y += p.speedY;
-                if(p.y < 0) { p.y = canvas.height; p.x = Math.random() * canvas.width; }
-                if(p.x < 0 || p.x > canvas.width) p.speedX *= -1;
-
-                if (mouse.x && mouse.y) {
-                    let dx = p.x - mouse.x;
-                    let dy = p.y - mouse.y;
-                    let dist = Math.sqrt(dx*dx + dy*dy);
-                    if (dist < mouse.radius) {
-                        let force = (mouse.radius - dist) / mouse.radius;
-                        p.x += (dx / dist) * force * 1.8;
-                        p.y += (dy / dist) * force * 1.8;
-                    }
-                }
-
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
-                ctx.fill();
-            });
-            requestAnimationFrame(animateParticles);
-        }
-        animateParticles();
-
-        // BOOT SEQUENCER
+        // SYSTEM BOOT SCRIPT SIMULATOR
         let progress = 0;
-        let isOverclocked = false;
         const bar = document.getElementById('progress-fill');
         const status = document.getElementById('boot-status');
-        
-        const bootTips = [
-            "Bypassing secure IoT automation layers...", "Mapping room terminal topologies...",
-            "Syncing Last.fm audio sync parameters...", "Scanning perimeter thermal laser arrays...",
-            "Overclocking toaster...", "Calibrating smart HVAC compressor...", "Establishing neural link loop..."
-        ];
 
         const bootInterval = setInterval(() => {
-            progress += Math.floor(Math.random() * 14) + 5;
+            progress += Math.floor(Math.random() * 20) + 10;
             if (progress >= 100) {
                 progress = 100;
                 clearInterval(bootInterval);
@@ -429,44 +321,17 @@
                     document.getElementById('boot-screen').style.display = 'none';
                     document.getElementById('dash').classList.add('active');
                     initMatrix();
-                    initPingGraph();
-                    initAudioEQ();
-                    initIoTAutomation();
-                    fetchLastFM();
                 }, 400);
             } else {
                 bar.style.width = progress + "%";
-                if (Math.random() > 0.6) {
-                    status.innerText = bootTips[Math.floor(Math.random() * bootTips.length)];
-                }
             }
-        }, 70);
+        }, 150);
 
-        // CLOCK
+        // REAL-TIME WINDOWS APPS CLOCK 
         setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
 
-        // LOG ENTRIES FEED
-        const log = document.getElementById('live-log');
-        const logEntries = [
-            "> SECURITY: Perimeter laser configurations pristine.", "> AUTOMATION: Server Room heat cycle minimized.",
-            "> NET: Scanning structural local area routing matrices...", "> CLIMATE: Primary Lounge HVAC loop optimal.",
-            "> INTERFACE: Active authorization profile verified: ._icey1", "> MONITOR: Atmospheric tracking anomalies zeroed out."
-        ];
-
-        setInterval(() => {
-            if(!isOverclocked && Math.random() > 0.3) pushTerminalLine(logEntries[Math.floor(Math.random() * logEntries.length)]);
-        }, 4500);
-
-        function pushTerminalLine(text) {
-            const entry = document.createElement('div');
-            entry.innerHTML = text;
-            log.appendChild(entry);
-            log.scrollTop = log.scrollHeight;
-            if (log.children.length > 20) log.removeChild(log.firstElementChild);
-        }
-
-        // HARDWARE CPU MATRIX
-        const coresCount = 12;
+        // VISTA CPU PROGRESS BAR REPLICATOR LOGIC
+        const coresCount = 6;
         function initMatrix() {
             const matrixBox = document.getElementById('cpu-core-container');
             matrixBox.innerHTML = '';
@@ -474,238 +339,26 @@
                 const block = document.createElement('div');
                 block.className = 'cpu-core-block';
                 block.innerHTML = `
-                    <span class="core-label">T_${String(i+1).padStart(2,'0')}</span>
+                    <span class="core-label">Core ${i+1}</span>
                     <div class="core-bar-rail"><div class="core-bar-fill" id="core-fill-${i}"></div></div>
                     <span class="core-val-text" id="core-txt-${i}">4%</span>
                 `;
                 matrixBox.appendChild(block);
             }
-            setInterval(updateMatrix, 1000);
+            setInterval(updateMatrix, 1500);
         }
 
         function updateMatrix() {
-            if (isOverclocked) return;
-            let totalLoad = 0;
             for(let i=0; i<coresCount; i++) {
-                let randLoad = Math.floor(Math.random() * 12) + 4;
-                if (Math.random() > 0.92) randLoad = Math.floor(Math.random() * 40) + 40;
-                totalLoad += randLoad;
-                
+                let randLoad = Math.floor(Math.random() * 25) + 5;
                 const fillEl = document.getElementById(`core-fill-${i}`);
                 const txtEl = document.getElementById(`core-txt-${i}`);
                 if (fillEl && txtEl) {
                     fillEl.style.width = randLoad + "%";
                     txtEl.innerText = randLoad + "%";
-                    fillEl.style.backgroundColor = randLoad > 70 ? 'var(--alert-red)' : (randLoad > 40 ? 'var(--v-gold)' : 'var(--neon-blue)');
                 }
             }
-            document.getElementById('matrix-load').innerText = `AVG: ${Math.round(totalLoad / coresCount)}%`;
         }
-
-        // TELEMETRY PING GRAPH
-        const totalBars = 22;
-        function initPingGraph() {
-            const graph = document.getElementById('graph-container');
-            graph.innerHTML = '';
-            for(let i=0; i<totalBars; i++) {
-                const barEl = document.createElement('div');
-                barEl.className = 'ping-bar';
-                barEl.style.height = (Math.floor(Math.random() * 25) + 15) + "%";
-                graph.appendChild(barEl);
-            }
-            setInterval(updatePingTelemetry, 800);
-        }
-
-        function updatePingTelemetry() {
-            const graph = document.getElementById('graph-container');
-            const currentPing = Math.floor(Math.random() * 10) + 16;
-            document.getElementById('ping-display').innerText = `${currentPing}ms`;
-            
-            if(graph.firstElementChild) graph.removeChild(graph.firstElementChild);
-            const nextBar = document.createElement('div');
-            nextBar.className = 'ping-bar';
-            nextBar.style.height = Math.min(100, currentPing * 3) + "%";
-            graph.appendChild(nextBar);
-        }
-
-        // IOT FLUCTUATION FLUID DRIVER
-        function initIoTAutomation() {
-            setInterval(() => {
-                // Fluctuating temperatures slightly
-                document.getElementById('env-server').innerText = `${(19 + Math.random()*0.8).toFixed(1)}°C // 41% RH`;
-                document.getElementById('env-lounge').innerText = `${(22 + Math.random()*0.5).toFixed(1)}°C // 47% RH`;
-                document.getElementById('env-lab').innerText = `${(20 + Math.random()*0.9).toFixed(1)}°C // 50% RH`;
-                
-                // Weather metrics shifting
-                document.getElementById('weather-temp').innerText = `${(28 + Math.random()*0.6).toFixed(1)}°C`;
-                document.getElementById('weather-wind').innerText = `${(13 + Math.random()*2).toFixed(1)} km/h NW`;
-            }, 3000);
-        }
-
-        // INTERACTIVE AUDIO EQ LINK
-        let eqInterval;
-        function initAudioEQ() {
-            const eqBars = document.querySelectorAll('.eq-bar');
-            eqInterval = setInterval(() => {
-                eqBars.forEach(bar => {
-                    let playing = document.getElementById('listening-status').innerText.includes('LIVE');
-                    let height = playing ? (Math.floor(Math.random() * 85) + 15) : 4;
-                    bar.style.height = height + "%";
-                });
-            }, 100);
-        }
-
-        // MACRO UTILITIES RUNNER
-        function runMacro(title) {
-            pushTerminalLine(`<span style="color:var(--v-gold);">&gt; RUNNING_MACRO: [ ${title.toUpperCase()} ]</span>`);
-            if (title.includes('lockdown')) {
-                executeLockdown();
-            } else if (title.includes('Reset')) {
-                executeSafeReset();
-            }
-        }
-
-        function executeLockdown() {
-            isOverclocked = true;
-            document.body.classList.add('critical-alert');
-            document.getElementById('cpu-module').style.borderColor = 'var(--alert-red)';
-            document.getElementById('shell-module').style.borderColor = 'var(--alert-red)';
-            document.getElementById('shell-header').style.background = 'rgba(255,51,102,0.15)';
-            document.getElementById('shell-header').style.color = 'var(--alert-red)';
-            document.getElementById('shell-status').innerText = 'CRITICAL_LOCKDOWN';
-            document.getElementById('shell-status').style.color = 'var(--alert-red)';
-            
-            document.getElementById('sec-lasers').className = "status-pill pill-red";
-            document.getElementById('sec-lasers').innerText = "OVERLOADED";
-            document.getElementById('sec-vault').className = "status-pill pill-red";
-            document.getElementById('sec-vault').innerText = "SEALED_ISOLATED";
-            document.getElementById('sec-threat').className = "status-pill pill-red";
-            document.getElementById('sec-threat').innerText = "99.82%";
-
-            document.getElementById('env-hvac').className = "status-pill pill-red";
-            document.getElementById('env-hvac').innerText = "EMERGENCY_SHUTDOWN";
-            document.getElementById('weather-status').className = "status-pill pill-red";
-            document.getElementById('weather-status').innerText = "HAZARDOUS";
-
-            pushTerminalLine("<span style='color:var(--alert-red); font-weight:bold;'>&gt; CRITICAL EXIGENCY: CORE AIRLOCK ENCLOSURES TRIGGERED!</span>");
-            document.getElementById('matrix-load').innerText = `AVG: 99%`;
-            for(let i=0; i<coresCount; i++) {
-                document.getElementById(`core-fill-${i}`).style.width = "99%";
-                document.getElementById(`core-fill-${i}`).style.backgroundColor = "var(--alert-red)";
-                document.getElementById(`core-txt-${i}`).innerText = "99%";
-            }
-        }
-
-        function executeSafeReset() {
-            isOverclocked = false;
-            document.body.classList.remove('critical-alert');
-            document.getElementById('cpu-module').style.borderColor = 'rgba(0, 242, 255, 0.25)';
-            document.getElementById('shell-module').style.borderColor = 'rgba(0, 255, 153, 0.35)';
-            document.getElementById('shell-header').style.background = 'rgba(0, 255, 153, 0.05)';
-            document.getElementById('shell-header').style.color = 'var(--hacker-green)';
-            document.getElementById('shell-status').innerText = 'ONLINE';
-            document.getElementById('shell-status').style.color = 'var(--hacker-green)';
-            
-            document.getElementById('sec-lasers').className = "status-pill pill-green";
-            document.getElementById('sec-lasers').innerText = "ENGAGED";
-            document.getElementById('sec-vault').className = "status-pill pill-green";
-            document.getElementById('sec-vault').innerText = "SECURED";
-            document.getElementById('sec-threat').className = "status-pill pill-green";
-            document.getElementById('sec-threat').innerText = "0.00%";
-
-            document.getElementById('env-hvac').className = "status-pill pill-green";
-            document.getElementById('env-hvac').innerText = "STABLE // RUNNING";
-            document.getElementById('weather-status').className = "status-pill pill-green";
-            document.getElementById('weather-status').innerText = "OPTIMAL";
-
-            pushTerminalLine("&gt; System structural vectors recovered. Core operational loops completely clean.");
-        }
-
-        // COMMAND INPUT ROUTER
-        const cmdInput = document.getElementById('cli-cmd');
-        cmdInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                const inputVal = cmdInput.value.trim();
-                if (!inputVal) return;
-                
-                pushTerminalLine(`<span style="color:#fff;">$ ${inputVal}</span>`);
-                cmdInput.value = '';
-                
-                const lowerCmd = inputVal.toLowerCase();
-                if (lowerCmd === '/help') {
-                    pushTerminalLine("<span style='color:var(--v-gold);'>CODES: /clear, /status, /overclock, /safe, /climate, /security, /weather</span>");
-                } else if (lowerCmd === '/clear') {
-                    log.innerHTML = "<div>&gt; Command console buffer wiped.</div>";
-                } else if (lowerCmd === '/status') {
-                    pushTerminalLine(isOverclocked ? "<span style='color:var(--alert-red);'>&gt; WARNING: HOME LINK APPARATUS LOCKDOWN IS ACTIVE.</span>" : "&gt; STATUS: All terminal hardware clusters optimal.");
-                } else if (lowerCmd === '/climate') {
-                    pushTerminalLine("&gt; SMART_HVAC: Server Room 19°C | Lounge 22°C | Compressor Load: Nominal");
-                } else if (lowerCmd === '/security') {
-                    pushTerminalLine("&gt; SECURITY: Perimeter tracking fields secure. Cam loops online. Threat index 0%.");
-                } else if (lowerCmd === '/weather') {
-                    pushTerminalLine("&gt; METEOROLOGY: Ambient temp 28.4°C. Local conditions completely static and clear.");
-                } else if (lowerCmd === '/overclock') {
-                    executeLockdown();
-                } else if (lowerCmd === '/safe') {
-                    executeSafeReset();
-                } else {
-                    pushTerminalLine(`&gt; ERROR: Unknown token argument parameter '${inputVal}'.`);
-                }
-            }
-        });
-
-        // RECENT TRACK FETCH (LAST.FM REST API SYNCER)
-        async function fetchLastFM() {
-            const username = "icy51";
-            const apiKey = "165952413aedf7410ea19baa387f2c00"; 
-            const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${username}&api_key=${apiKey}&format=json&limit=1`;
-            
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('API Sync failure');
-                const data = await response.json();
-                
-                const track = data.recenttracks.track[0];
-                const totalScrobbles = data.recenttracks['@attr'].total;
-                
-                const name = track.name;
-                const artist = track.artist['#text'];
-                const isNowPlaying = track['@attr'] && track['@attr'].nowplaying === "true";
-                
-                let imgUrl = "";
-                if(track.image && track.image.length > 0) {
-                    imgUrl = track.image[Math.min(2, track.image.length - 1)]['#text'];
-                }
-                
-                document.getElementById('track-title').innerText = name.toUpperCase();
-                document.getElementById('track-artist').innerText = artist.toUpperCase();
-                document.getElementById('total-scrobbles').innerText = Number(totalScrobbles).toLocaleString();
-                
-                const artImg = document.getElementById('album-art');
-                const artFallback = document.getElementById('art-fallback');
-                if(imgUrl && imgUrl.trim() !== "") {
-                    artImg.src = imgUrl; artImg.style.display = "block"; artFallback.style.display = "none";
-                } else {
-                    artImg.style.display = "none"; artFallback.style.display = "block";
-                }
-                
-                const statusIndicator = document.getElementById('listening-status');
-                const eqContainer = document.getElementById('eq-wrapper');
-                if (isNowPlaying) {
-                    statusIndicator.innerHTML = `<span class="pulse-dot pulsing"></span>LIVE`;
-                    statusIndicator.style.color = "var(--hacker-green)";
-                    eqContainer.style.opacity = "1";
-                } else {
-                    statusIndicator.innerHTML = `<span class="pulse-dot" style="background-color: #3b484a; box-shadow: none;"></span>IDLE`;
-                    statusIndicator.style.color = "#77888a";
-                    eqContainer.style.opacity = "0.25";
-                }
-            } catch (error) {
-                console.error('Telemetry Error:', error);
-                document.getElementById('track-title').innerText = "SIGNAL_LOST_TELEMETRY";
-            }
-        }
-        setInterval(fetchLastFM, 8000);
     </script>
 </body>
 </html>
