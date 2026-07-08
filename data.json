@@ -1,4 +1,7 @@
 {
-  "announcement": "chicken sandwich",
-  "aboutText": "i like minecraft and stuff"
+  "announcement": "hi",
+  "aboutText": "all hail icy",
+"guestbook": [
+    { "name": "icy", "message": "ss2 is a bum server" }
+  ]
 }
