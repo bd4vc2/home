@@ -87,13 +87,7 @@
             margin-bottom: 10px;
         }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 3px;
-            font-weight: bold;
-        }
-
-        input[type="text"], textarea, select {
+        input[type="text"] {
             width: 100%;
             box-sizing: border-box;
             font-family: inherit;
@@ -164,7 +158,7 @@
             </div>
             <div class="window-body">
                 <p id="display-about" style="margin: 0; line-height: 1.5;">
-                    all hail icy
+                    Loading...
                 </p>
             </div>
         </div>
@@ -176,13 +170,11 @@
             </div>
             <div class="window-body" style="text-align: center;">
                 <div style="background-color: #000000; color: #00ff00; font-family: monospace; padding: 10px; border: 2px solid #808080; margin-bottom: 10px;">
-                    <div id="media-status" style="font-weight: bold;">[STOPPED]</div>
-                    <div id="media-title" style="font-size: 11px; margin-top: 4px;">No file loaded</div>
+                    <div id="media-status" style="font-weight: bold;">[CONNECTING]</div>
+                    <div id="media-title" style="font-size: 11px; margin-top: 4px;">Querying Last.fm feed...</div>
                 </div>
-                <div style="display: flex; justify-content: center; gap: 5px;">
-                    <button class="win-btn" onclick="playMedia('Mice on Venus - C418')">Play Track 1</button>
-                    <button class="win-btn" onclick="playMedia('Stickerbush Symphony - DKC2')">Play Track 2</button>
-                    <button class="win-btn" onclick="stopMedia()">Stop</button>
+                <div style="font-size: 10px; color: #666; text-align: left; padding: 2px;">
+                    * Synchronized live with Last.fm desktop/mobile scrobbler.
                 </div>
             </div>
         </div>
@@ -218,35 +210,6 @@
             </div>
         </div>
 
-        <div class="window" style="grid-column: 1 / -1;">
-            <div class="title-bar">
-                <span class="title-bar-text">Local Administrator Panel</span>
-                <div class="title-bar-controls"><button>X</button></div>
-            </div>
-            <div class="window-body" style="background-color: #f4f0ec;">
-                <p style="margin-top: 0; font-size: 11px; color: #555;">
-                    Since this is hosted on GitHub Pages, changes made here will persist only in your current browser session. To make them permanent, update your project file repository.
-                </p>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div>
-                        <div class="form-group">
-                            <label>Update Site Announcement Banner:</label>
-                            <input type="text" id="admin-announcement" placeholder="Type a notice to display across the site...">
-                        </div>
-                        <button class="win-btn" onclick="saveAnnouncement()">Update Banner</button>
-                        <button class="win-btn" onclick="clearAnnouncement()">Remove Banner</button>
-                    </div>
-                    <div>
-                        <div class="form-group">
-                            <label>Edit Profile Description Text:</label>
-                            <textarea id="admin-about" rows="3">I like cookies and food, KSP, RDR2, Nintendo, gaming, space, and a bunch of other cool stuff. Welcome to my central home interface.</textarea>
-                        </div>
-                        <button class="win-btn" onclick="saveAboutText()">Update Profile Text</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </main>
 
     <div style="text-align: center; margin-top: 30px; padding: 10px; color: #ffffff;">
@@ -262,15 +225,43 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        function playMedia(trackName) {
-            document.getElementById('media-status').innerText = "[PLAYING]";
-            document.getElementById('media-title').innerText = trackName;
+        var LASTFM_USER = "icy51";
+        var API_KEY = "3baec7f2bd8565bba335da4a6727932c"; // Public read-only request key
+
+        function updateMediaPlayer() {
+            var url = "https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=" + LASTFM_USER + "&api_key=" + API_KEY + "&format=json&limit=1";
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.recenttracks || !data.recenttracks.track || data.recenttracks.track.length === 0) {
+                        document.getElementById('media-status').innerText = "[STOPPED]";
+                        document.getElementById('media-title').innerText = "No track history found";
+                        return;
+                    }
+                    
+                    var track = data.recenttracks.track[0];
+                    var statusEl = document.getElementById('media-status');
+                    var titleEl = document.getElementById('media-title');
+                    
+                    var isNowPlaying = track['@attr'] && track['@attr'].nowplaying === "true";
+                    
+                    if (isNowPlaying) {
+                        statusEl.innerText = "[PLAYING NOW]";
+                    } else {
+                        statusEl.innerText = "[LAST PLAYED]";
+                    }
+                    
+                    titleEl.innerText = track.name + " - " + track.artist['#text'];
+                })
+                .catch(err => {
+                    document.getElementById('media-status').innerText = "[ERROR]";
+                    document.getElementById('media-title').innerText = "Offline";
+                });
         }
 
-        function stopMedia() {
-            document.getElementById('media-status').innerText = "[STOPPED]";
-            document.getElementById('media-title').innerText = "No file loaded";
-        }
+        setInterval(updateMediaPlayer, 30000);
+        updateMediaPlayer();
 
         function addGuestbookEntry() {
             var nameInput = document.getElementById('gb-name');
@@ -293,44 +284,22 @@
             msgInput.value = "";
         }
 
-        function saveAnnouncement() {
-            var text = document.getElementById('admin-announcement').value;
-            var banner = document.getElementById('site-announcement');
-            if(text.trim() !== "") {
-                banner.innerText = text;
-                banner.style.display = "block";
-                localStorage.setItem('siteNotice', text);
-            }
-        }
-
-        function clearAnnouncement() {
-            var banner = document.getElementById('site-announcement');
-            banner.style.display = "none";
-            banner.innerText = "";
-            document.getElementById('admin-announcement').value = "";
-            localStorage.removeItem('siteNotice');
-        }
-
-        function saveAboutText() {
-            var text = document.getElementById('admin-about').value;
-            document.getElementById('display-about').innerText = text;
-            localStorage.setItem('aboutText', text);
-        }
-
         function loadSavedData() {
-            var savedNotice = localStorage.getItem('siteNotice');
-            if(savedNotice) {
-                var banner = document.getElementById('site-announcement');
-                banner.innerText = savedNotice;
-                banner.style.display = "block";
-                document.getElementById('admin-announcement').value = savedNotice;
-            }
-
-            var savedAbout = localStorage.getItem('aboutText');
-            if(savedAbout) {
-                document.getElementById('display-about').innerText = savedAbout;
-                document.getElementById('admin-about').value = savedAbout;
-            }
+            fetch('data.json?t=' + new Date().getTime())
+                .then(response => response.json())
+                .then(data => {
+                    var banner = document.getElementById('site-announcement');
+                    if(data.announcement && data.announcement.trim() !== "") {
+                        banner.innerText = data.announcement;
+                        banner.style.display = "block";
+                    } else {
+                        banner.style.display = "none";
+                    }
+                    document.getElementById('display-about').innerText = data.aboutText || "all hail icy";
+                })
+                .catch(err => {
+                    document.getElementById('display-about').innerText = "all hail icy";
+                });
         }
 
         function escapeHTML(str) {
