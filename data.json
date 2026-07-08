@@ -1,8 +1,11 @@
 {
   "announcement": "icy website",
-  "aboutText": "all hail icy",
+  "aboutText": "all hail icy + half sword is the best game ever",
   "tickerText": "+++ welcome to icy website +++ best viewed with inter explorer 5.5 +++ ALL HAIL ICY +++ SCROLLING TEXT FOR NO REASON! +++",
   "guestbook": [
-    { "name": "icy", "message": "all hail icy" }
+    {
+      "name": "icy",
+      "message": "all hail icy"
+    }
   ]
 }
