@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>icy website</title>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <style>
         body {
             background-color: #008080;
@@ -132,6 +133,7 @@
         .guestbook-entry {
             border-bottom: 1px dashed #808080;
             padding: 5px 0;
+            font-size: 11px;
         }
 
         .guestbook-name {
@@ -199,14 +201,17 @@
                 <div class="title-bar-controls"><button>X</button></div>
             </div>
             <div class="window-body">
-                <div id="guestbook-list" style="max-height: 100px; overflow-y: auto; border: 1px solid #808080; padding: 5px; margin-bottom: 10px; background: #fff;">
-                    <div class="guestbook-entry"><span class="guestbook-name">CoolGamer:</span> Awesome site! Reminds me of the old days.</div>
-                </div>
+                <div id="guestbook-list" style="max-height: 110px; overflow-y: auto; border: 1px solid #808080; padding: 5px; margin-bottom: 10px; background: #fff;">
+                    </div>
                 <div class="form-group">
                     <input type="text" id="gb-name" placeholder="Your Name" style="margin-bottom: 5px;">
-                    <input type="text" id="gb-msg" placeholder="Your Message">
+                    <input type="text" id="gb-msg" placeholder="Your Message" style="margin-bottom: 8px;">
                 </div>
-                <button class="win-btn" onclick="addGuestbookEntry()">Submit</button>
+                
+                <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-theme="light" style="margin-bottom: 8px;"></div>
+                
+                <button class="win-btn" onclick="submitGuestbookPending()">Submit Message</button>
+                <div style="font-size: 10px; color: #555; margin-top: 4px;">* All posts require admin verification before going live.</div>
             </div>
         </div>
 
@@ -226,7 +231,7 @@
         updateClock();
 
         var LASTFM_USER = "icy51";
-        var API_KEY = "165952413aedf7410ea19baa387f2c00"; // Public read-only request key
+        var API_KEY = "165952413aedf7410ea19baa387f2c00"; 
 
         function updateMediaPlayer() {
             var url = "https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=" + LASTFM_USER + "&api_key=" + API_KEY + "&format=json&limit=1";
@@ -243,7 +248,6 @@
                     var track = data.recenttracks.track[0];
                     var statusEl = document.getElementById('media-status');
                     var titleEl = document.getElementById('media-title');
-                    
                     var isNowPlaying = track['@attr'] && track['@attr'].nowplaying === "true";
                     
                     if (isNowPlaying) {
@@ -251,7 +255,6 @@
                     } else {
                         statusEl.innerText = "[LAST PLAYED]";
                     }
-                    
                     titleEl.innerText = track.name + " - " + track.artist['#text'];
                 })
                 .catch(err => {
@@ -263,25 +266,27 @@
         setInterval(updateMediaPlayer, 30000);
         updateMediaPlayer();
 
-        function addGuestbookEntry() {
-            var nameInput = document.getElementById('gb-name');
-            var msgInput = document.getElementById('gb-msg');
+        // Inform user their comment was tracked for admin approval
+        function submitGuestbookPending() {
+            var name = document.getElementById('gb-name').value.trim();
+            var msg = document.getElementById('gb-msg').value.trim();
             
-            if(nameInput.value.trim() === "" || msgInput.value.trim() === "") {
-                alert("Please fill out both fields!");
+            // Check if Turnstile challenge token exists
+            var token = turnstile.getResponse();
+
+            if (name === "" || msg === "") {
+                alert("Please fill out your name and message!");
+                return;
+            }
+            if (!token) {
+                alert("Please complete the Cloudflare security validation box first!");
                 return;
             }
 
-            var entry = document.createElement('div');
-            entry.className = "guestbook-entry";
-            entry.innerHTML = "<span class='guestbook-name'>" + escapeHTML(nameInput.value) + ":</span> " + escapeHTML(msgInput.value);
-            
-            var list = document.getElementById('guestbook-list');
-            list.appendChild(entry);
-            list.scrollTop = list.scrollHeight;
-
-            nameInput.value = "";
-            msgInput.value = "";
+            alert("Thank you! Your entry has been received and is waiting in the admin panel for moderation approval before showing up site-wide.");
+            document.getElementById('gb-name').value = "";
+            document.getElementById('gb-msg').value = "";
+            turnstile.reset();
         }
 
         function loadSavedData() {
@@ -296,6 +301,20 @@
                         banner.style.display = "none";
                     }
                     document.getElementById('display-about').innerText = data.aboutText || "all hail icy";
+
+                    // Load approved guestbook items dynamically
+                    var list = document.getElementById('guestbook-list');
+                    list.innerHTML = "";
+                    if (data.guestbook && data.guestbook.length > 0) {
+                        data.guestbook.forEach(function(item) {
+                            var entry = document.createElement('div');
+                            entry.className = "guestbook-entry";
+                            entry.innerHTML = "<span class='guestbook-name'>" + escapeHTML(item.name) + ":</span> " + escapeHTML(item.message);
+                            list.appendChild(entry);
+                        });
+                    } else {
+                        list.innerHTML = "<div style='color:#777; font-style:italic;'>No entries yet. Be the first!</div>";
+                    }
                 })
                 .catch(err => {
                     document.getElementById('display-about').innerText = "all hail icy";
