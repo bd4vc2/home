@@ -11,6 +11,7 @@
             font-family: "MS Sans Serif", Geneva, sans-serif;
             font-size: 12px;
             margin: 10px;
+            padding-bottom: 40px; /* Space for the bottom marquee */
         }
 
         #desktop-grid {
@@ -140,6 +141,35 @@
             font-weight: bold;
             color: #000080;
         }
+
+        /* Hit Counter Styling */
+        .counter-box {
+            background-color: #000000;
+            color: #ff0000;
+            font-family: "Courier New", monospace;
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            padding: 2px 8px;
+            border: 2px inset #808080;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        /* Bottom Marquee Bar */
+        .retro-marquee {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #d4d0c8;
+            border-top: 2px solid #ffffff;
+            color: #000;
+            padding: 4px 0;
+            font-size: 11px;
+            box-shadow: 0 -1px 4px rgba(0,0,0,0.2);
+            z-index: 9999;
+        }
     </style>
 </head>
 <body>
@@ -162,6 +192,11 @@
                 <p id="display-about" style="margin: 0; line-height: 1.5;">
                     Loading...
                 </p>
+                <hr style="margin-top: 15px;">
+                <div style="text-align: center; margin-top: 10px;">
+                    <div style="font-size: 10px; font-weight: bold; color: #555;">YOU ARE VISITOR NUMBER:</div>
+                    <div class="counter-box" id="hit-counter">002491</div>
+                </div>
             </div>
         </div>
 
@@ -191,7 +226,15 @@
                 <a href="https://www.roblox.com/users/4447690823/profile" target="_blank">My Roblox Profile</a>
                 <a href="https://www.last.fm/user/icy51" target="_blank">My Last.fm Page</a>
                 <hr>
-                <div style="font-size: 11px; color: #555;">Discord ID: ._icey1</div>
+                <div style="font-size: 11px; color: #555; margin-bottom: 10px;">Discord ID: ._icey1</div>
+                
+                <div style="border-top: 1px solid #808080; padding-top: 8px; text-align: center;">
+                    <div style="font-size: 9px; color: #666; margin-bottom: 5px; font-weight: bold;">WEB STAMP COLLECTIBLES:</div>
+                    <div style="display: flex; justify-content: center; gap: 4px; flex-wrap: wrap;">
+                        <img src="https://web.archive.org/web/20091027052912im_/http://geocities.com/SunsetStrip/Studio/1002/ie_static.gif" alt="IE Button" width="88" height="31">
+                        <img src="https://web.archive.org/web/20090830050232im_/http://geocities.com/SiliconValley/Way/4011/notepad.gif" alt="Made with Notepad" width="88" height="31">
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -222,6 +265,12 @@
         <span>Optimized for Internet Explorer 5.0 at 1024x768 resolution.</span>
     </div>
 
+    <div class="retro-marquee">
+        <marquee scrollamount="4" behavior="scroll" direction="left">
+            +++ WELCOME TO ICY'S CENTRAL HUB +++ BEST VIEWED WITH A CRT MONITOR +++ ALL HAIL ICY +++ SCROLLING TEXT LIKE IT IS THE YEAR 2000! +++
+        </marquee>
+    </div>
+
     <script>
         function updateClock() {
             var now = new Date();
@@ -229,6 +278,21 @@
         }
         setInterval(updateClock, 1000);
         updateClock();
+
+        // Simulated Local Storage Hit Counter so it ticks up on refreshing the page!
+        function updateHitCounter() {
+            var currentHits = localStorage.getItem('siteHits');
+            if (!currentHits) {
+                currentHits = 2491; // Starting number for authentic old-school flavor
+            }
+            currentHits = parseInt(currentHits) + 1;
+            localStorage.setItem('siteHits', currentHits);
+            
+            // Format number to always be 6 digits (padded with zeros)
+            var paddedHits = String(currentHits).padStart(6, '0');
+            document.getElementById('hit-counter').innerText = paddedHits;
+        }
+        updateHitCounter();
 
         var LASTFM_USER = "icy51";
         var API_KEY = "165952413aedf7410ea19baa387f2c00"; 
@@ -266,12 +330,9 @@
         setInterval(updateMediaPlayer, 30000);
         updateMediaPlayer();
 
-        // Inform user their comment was tracked for admin approval
         function submitGuestbookPending() {
             var name = document.getElementById('gb-name').value.trim();
             var msg = document.getElementById('gb-msg').value.trim();
-            
-            // Check if Turnstile challenge token exists
             var token = turnstile.getResponse();
 
             if (name === "" || msg === "") {
@@ -302,7 +363,6 @@
                     }
                     document.getElementById('display-about').innerText = data.aboutText || "all hail icy";
 
-                    // Load approved guestbook items dynamically
                     var list = document.getElementById('guestbook-list');
                     list.innerHTML = "";
                     if (data.guestbook && data.guestbook.length > 0) {
