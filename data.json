@@ -1,10 +1,8 @@
 {
   "announcement": "icy website",
   "aboutText": "all hail icy",
+  "tickerText": "+++ welcome to icy website +++ best viewed with inter explorer 5.5 +++ ALL HAIL ICY +++ SCROLLING TEXT FOR NO REASON! +++",
   "guestbook": [
-    {
-      "name": "icy",
-      "message": "this website annoys me! :super_angry_emoji:"
-    }
+    { "name": "icy", "message": "all hail icy" }
   ]
 }
