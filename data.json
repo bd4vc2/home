@@ -1,4 +1,10 @@
 {
   "announcement": "icy website",
-  "aboutText": "all hail icy"
+  "aboutText": "all hail icy",
+  "guestbook": [
+    {
+      "name": "icy",
+      "message": "this website annoys me! :super_angry_emoji:"
+    }
+  ]
 }
