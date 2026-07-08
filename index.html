@@ -11,7 +11,7 @@
             font-family: "MS Sans Serif", Geneva, sans-serif;
             font-size: 12px;
             margin: 10px;
-            padding-bottom: 40px; /* Space for the bottom marquee */
+            padding-bottom: 40px;
         }
 
         #desktop-grid {
@@ -142,7 +142,6 @@
             color: #000080;
         }
 
-        /* Hit Counter Styling */
         .counter-box {
             background-color: #000000;
             color: #ff0000;
@@ -156,7 +155,6 @@
             margin-top: 5px;
         }
 
-        /* Bottom Marquee Bar */
         .retro-marquee {
             position: fixed;
             bottom: 0;
@@ -170,13 +168,37 @@
             box-shadow: 0 -1px 4px rgba(0,0,0,0.2);
             z-index: 9999;
         }
+
+        /* Fake Winamp EQ Bars visualizer */
+        .eq-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 2px;
+            height: 25px;
+            margin-top: 8px;
+            background: #111;
+            padding: 4px;
+            border: 1px inset #808080;
+        }
+        .eq-bar {
+            width: 6px;
+            height: 100%;
+            background: linear-gradient(to top, #00ff00, #ffff00, #ff0000);
+            transform-origin: bottom;
+            animation: bounceEQ 0.8s ease-in-out infinite alternate;
+        }
+        @keyframes bounceEQ {
+            0% { transform: scaleY(0.2); }
+            100% { transform: scaleY(0.9); }
+        }
     </style>
 </head>
 <body>
 
     <div style="text-align: center; margin-bottom: 20px;">
-        <h1 style="color: #ffffff; font-family: 'Times New Roman', Times, serif; margin: 5px 0;">Icey's Central Hub</h1>
-        <div style="color: #ffffff;" id="browser-clock"></div>
+        <h1 style="color: #ffffff; font-family: 'Times New Roman', Times, serif; margin: 5px 0; font-weight: normal; font-size: 26px;">icey's central hub</h1>
+        <div style="color: #ffffff; font-size: 11px;" id="browser-clock"></div>
     </div>
 
     <div id="site-announcement" class="announcement-banner" style="display: none;"></div>
@@ -185,13 +207,19 @@
 
         <div class="window">
             <div class="title-bar">
-                <span class="title-bar-text">About Me</span>
+                <span class="title-bar-text">about me</span>
                 <div class="title-bar-controls"><button>X</button></div>
             </div>
             <div class="window-body">
-                <p id="display-about" style="margin: 0; line-height: 1.5;">
-                    Loading...
+                <p id="display-about" style="margin: 0; line-height: 1.5; text-transform: lowercase;">
+                    loading...
                 </p>
+                
+                <div style="margin-top: 15px; border: 1px dotted #808080; padding: 6px; background: #fdfdfd; display: flex; align-items: center; gap: 8px;">
+                    <span style="width: 8px; height: 8px; background: #00ff00; border-radius: 50%; display: inline-block; box-shadow: 0 0 4px #00ff00;"></span>
+                    <div style="font-size: 10px; color:#333;"><b>status:</b> current location: desktop typing things</div>
+                </div>
+
                 <hr style="margin-top: 15px;">
                 <div style="text-align: center; margin-top: 10px;">
                     <div style="font-size: 10px; font-weight: bold; color: #555;">YOU ARE VISITOR NUMBER:</div>
@@ -202,37 +230,46 @@
 
         <div class="window">
             <div class="title-bar">
-                <span class="title-bar-text">My Media Player</span>
+                <span class="title-bar-text">my media player</span>
                 <div class="title-bar-controls"><button>X</button></div>
             </div>
             <div class="window-body" style="text-align: center;">
-                <div style="background-color: #000000; color: #00ff00; font-family: monospace; padding: 10px; border: 2px solid #808080; margin-bottom: 10px;">
+                <div style="background-color: #000000; color: #00ff00; font-family: monospace; padding: 10px; border: 2px solid #808080; margin-bottom: 5px;">
                     <div id="media-status" style="font-weight: bold;">[CONNECTING]</div>
-                    <div id="media-title" style="font-size: 11px; margin-top: 4px;">Querying Last.fm feed...</div>
+                    <div id="media-title" style="font-size: 11px; margin-top: 4px; text-transform: lowercase;">querying last.fm feed...</div>
                 </div>
-                <div style="font-size: 10px; color: #666; text-align: left; padding: 2px;">
-                    * Synchronized live with Last.fm desktop/mobile scrobbler.
+                
+                <div class="eq-container">
+                    <div class="eq-bar" style="animation-delay: 0.1s;"></div>
+                    <div class="eq-bar" style="animation-delay: 0.4s;"></div>
+                    <div class="eq-bar" style="animation-delay: 0.2s;"></div>
+                    <div class="eq-bar" style="animation-delay: 0.6s;"></div>
+                    <div class="eq-bar" style="animation-delay: 0.3s;"></div>
+                </div>
+
+                <div style="font-size: 10px; color: #666; text-align: left; padding: 2px; margin-top: 8px;">
+                    * synchronized live with last.fm desktop/mobile scrobbler.
                 </div>
             </div>
         </div>
 
         <div class="window">
             <div class="title-bar">
-                <span class="title-bar-text">Cool Links</span>
+                <span class="title-bar-text">cool links</span>
                 <div class="title-bar-controls"><button>X</button></div>
             </div>
             <div class="window-body link-list">
-                <a href="https://www.youtube.com/@yeci_.1" target="_blank">My YouTube Channel</a>
-                <a href="https://www.roblox.com/users/4447690823/profile" target="_blank">My Roblox Profile</a>
-                <a href="https://www.last.fm/user/icy51" target="_blank">My Last.fm Page</a>
+                <a href="https://www.youtube.com/@yeci_.1" target="_blank" style="text-transform: lowercase;">my youtube channel</a>
+                <a href="https://www.roblox.com/users/4447690823/profile" target="_blank" style="text-transform: lowercase;">my roblox profile</a>
+                <a href="https://www.last.fm/user/icy51" target="_blank" style="text-transform: lowercase;">my last.fm page</a>
                 <hr>
-                <div style="font-size: 11px; color: #555; margin-bottom: 10px;">Discord ID: ._icey1</div>
+                <div style="font-size: 11px; color: #555; margin-bottom: 10px; text-transform: lowercase;">discord id: ._icey1</div>
                 
                 <div style="border-top: 1px solid #808080; padding-top: 8px; text-align: center;">
                     <div style="font-size: 9px; color: #666; margin-bottom: 5px; font-weight: bold;">WEB STAMP COLLECTIBLES:</div>
                     <div style="display: flex; justify-content: center; gap: 4px; flex-wrap: wrap;">
                         <img src="https://web.archive.org/web/20091027052912im_/http://geocities.com/SunsetStrip/Studio/1002/ie_static.gif" alt="IE Button" width="88" height="31">
-                        <img src="https://web.archive.org/web/20090830050232im_/http://geocities.com/SiliconValley/Way/4011/notepad.gif" alt="Made with Notepad" width="88" height="31">
+                        <img src="https://img.shields.io/badge/Made%20With-Notepad%2B%2B-007ACC?style=flat&logo=notepadplusplus&logoColor=white" alt="Made with Notepad++" style="border:1px solid #777; width:88px; height:31px; image-rendering: pixelated;">
                     </div>
                 </div>
             </div>
@@ -240,57 +277,48 @@
 
         <div class="window">
             <div class="title-bar">
-                <span class="title-bar-text">Sign My Guestbook</span>
+                <span class="title-bar-text">sign my guestbook</span>
                 <div class="title-bar-controls"><button>X</button></div>
             </div>
             <div class="window-body">
                 <div id="guestbook-list" style="max-height: 110px; overflow-y: auto; border: 1px solid #808080; padding: 5px; margin-bottom: 10px; background: #fff;">
-                    </div>
+                </div>
                 <div class="form-group">
-                    <input type="text" id="gb-name" placeholder="Your Name" style="margin-bottom: 5px;">
-                    <input type="text" id="gb-msg" placeholder="Your Message" style="margin-bottom: 8px;">
+                    <input type="text" id="gb-name" placeholder="your name" style="margin-bottom: 5px;">
+                    <input type="text" id="gb-msg" placeholder="your message" style="margin-bottom: 8px;">
                 </div>
                 
                 <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-theme="light" style="margin-bottom: 8px;"></div>
                 
-                <button class="win-btn" onclick="submitGuestbookPending()">Submit Message</button>
-                <div style="font-size: 10px; color: #555; margin-top: 4px;">* All posts require admin verification before going live.</div>
+                <button class="win-btn" onclick="submitGuestbookPending()" style="text-transform: lowercase;">submit message</button>
+                <div style="font-size: 10px; color: #555; margin-top: 4px; text-transform: lowercase;">* all posts require admin verification before going live.</div>
             </div>
         </div>
 
     </main>
 
-    <div style="text-align: center; margin-top: 30px; padding: 10px; color: #ffffff;">
+    <div style="text-align: center; margin-top: 30px; padding: 10px; color: #ffffff; font-size:11px;">
         <img src="https://web.archive.org/web/20091027074332im_/http://geocities.com/SiliconValley/Way/4011/ie_animated.gif" alt="Internet Explorer Logo" style="vertical-align: middle; margin-right: 5px;">
-        <span>Optimized for Internet Explorer 5.0 at 1024x768 resolution.</span>
+        <span style="text-transform: lowercase;">optimized for internet explorer 5.0 at 1024x768 resolution.</span>
     </div>
 
     <div class="retro-marquee">
-        <marquee scrollamount="4" behavior="scroll" direction="left">
-            +++ WELCOME TO ICY'S CENTRAL HUB +++ BEST VIEWED WITH A CRT MONITOR +++ ALL HAIL ICY +++ SCROLLING TEXT LIKE IT IS THE YEAR 2000! +++
-        </marquee>
+        <marquee id="live-ticker" scrollamount="4" behavior="scroll" direction="left">+++ loading ticker text stream +++</marquee>
     </div>
 
     <script>
         function updateClock() {
             var now = new Date();
-            document.getElementById('browser-clock').innerText = now.toLocaleString();
+            document.getElementById('browser-clock').innerText = now.toLocaleString().toLowerCase();
         }
         setInterval(updateClock, 1000);
         updateClock();
 
-        // Simulated Local Storage Hit Counter so it ticks up on refreshing the page!
         function updateHitCounter() {
-            var currentHits = localStorage.getItem('siteHits');
-            if (!currentHits) {
-                currentHits = 2491; // Starting number for authentic old-school flavor
-            }
+            var currentHits = localStorage.getItem('siteHits') || 2491;
             currentHits = parseInt(currentHits) + 1;
             localStorage.setItem('siteHits', currentHits);
-            
-            // Format number to always be 6 digits (padded with zeros)
-            var paddedHits = String(currentHits).padStart(6, '0');
-            document.getElementById('hit-counter').innerText = paddedHits;
+            document.getElementById('hit-counter').innerText = String(currentHits).padStart(6, '0');
         }
         updateHitCounter();
 
@@ -299,34 +327,27 @@
 
         function updateMediaPlayer() {
             var url = "https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=" + LASTFM_USER + "&api_key=" + API_KEY + "&format=json&limit=1";
-            
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
                     if (!data.recenttracks || !data.recenttracks.track || data.recenttracks.track.length === 0) {
                         document.getElementById('media-status').innerText = "[STOPPED]";
-                        document.getElementById('media-title').innerText = "No track history found";
+                        document.getElementById('media-title').innerText = "no track history found";
                         return;
                     }
-                    
                     var track = data.recenttracks.track[0];
                     var statusEl = document.getElementById('media-status');
                     var titleEl = document.getElementById('media-title');
                     var isNowPlaying = track['@attr'] && track['@attr'].nowplaying === "true";
                     
-                    if (isNowPlaying) {
-                        statusEl.innerText = "[PLAYING NOW]";
-                    } else {
-                        statusEl.innerText = "[LAST PLAYED]";
-                    }
-                    titleEl.innerText = track.name + " - " + track.artist['#text'];
+                    statusEl.innerText = isNowPlaying ? "[PLAYING NOW]" : "[LAST PLAYED]";
+                    titleEl.innerText = (track.name + " - " + track.artist['#text']).toLowerCase();
                 })
                 .catch(err => {
                     document.getElementById('media-status').innerText = "[ERROR]";
-                    document.getElementById('media-title').innerText = "Offline";
+                    document.getElementById('media-title').innerText = "offline";
                 });
         }
-
         setInterval(updateMediaPlayer, 30000);
         updateMediaPlayer();
 
@@ -336,15 +357,15 @@
             var token = turnstile.getResponse();
 
             if (name === "" || msg === "") {
-                alert("Please fill out your name and message!");
+                alert("please fill out your name and message!");
                 return;
             }
             if (!token) {
-                alert("Please complete the Cloudflare security validation box first!");
+                alert("please complete the cloudflare security validation box first!");
                 return;
             }
 
-            alert("Thank you! Your entry has been received and is waiting in the admin panel for moderation approval before showing up site-wide.");
+            alert("thank you! your entry has been received and is waiting in the admin panel for moderation approval.");
             document.getElementById('gb-name').value = "";
             document.getElementById('gb-msg').value = "";
             turnstile.reset();
@@ -356,12 +377,17 @@
                 .then(data => {
                     var banner = document.getElementById('site-announcement');
                     if(data.announcement && data.announcement.trim() !== "") {
-                        banner.innerText = data.announcement;
+                        banner.innerText = data.announcement.toLowerCase();
                         banner.style.display = "block";
                     } else {
                         banner.style.display = "none";
                     }
-                    document.getElementById('display-about').innerText = data.aboutText || "all hail icy";
+                    document.getElementById('display-about').innerText = (data.aboutText || "all hail icy").toLowerCase();
+                    
+                    // Loads your dynamic dashboard text value directly into the marquee widget!
+                    if(data.tickerText) {
+                        document.getElementById('live-ticker').innerText = data.tickerText.toLowerCase();
+                    }
 
                     var list = document.getElementById('guestbook-list');
                     list.innerHTML = "";
@@ -369,11 +395,11 @@
                         data.guestbook.forEach(function(item) {
                             var entry = document.createElement('div');
                             entry.className = "guestbook-entry";
-                            entry.innerHTML = "<span class='guestbook-name'>" + escapeHTML(item.name) + ":</span> " + escapeHTML(item.message);
+                            entry.innerHTML = "<span class='guestbook-name'>" + escapeHTML(item.name).toLowerCase() + ":</span> " + escapeHTML(item.message).toLowerCase();
                             list.appendChild(entry);
                         });
                     } else {
-                        list.innerHTML = "<div style='color:#777; font-style:italic;'>No entries yet. Be the first!</div>";
+                        list.innerHTML = "<div style='color:#777; font-style:italic;'>no entries yet. be the first!</div>";
                     }
                 })
                 .catch(err => {
@@ -384,7 +410,6 @@
         function escapeHTML(str) {
             return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
-
         window.onload = loadSavedData;
     </script>
 </body>
